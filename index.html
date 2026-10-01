@@ -18,14 +18,14 @@
     --bg-container: #ffffff;
     
     /* Paleta Alemanha Premium */
-    --germany-black: #111827;  /* Preto sofisicado para textos e elementos fortes */
-    --germany-red: #DD0000;    /* Vermelho vibrante para destaques e botões */
-    --germany-gold: #D4AF37;   /* Dourado elegante para badges e detalhes finos */
+    --germany-black: #111827;
+    --germany-red: #DD0000;
+    --germany-gold: #D4AF37;
     --germany-gold-light: rgba(212, 175, 55, 0.1);
     
-    --text-label: #5e6a75;     /* Cinza dos labels da imagem original */
+    --text-label: #5e6a75;
     --text-input: #1f2937;
-    --bg-input: #f8f9fa;       /* Fundo claro dos inputs da imagem original */
+    --bg-input: #f8f9fa;
     --border-radius-main: 16px;
     --border-radius-input: 12px;
 }
@@ -296,11 +296,14 @@ const parentesco = {
 };
 
 function atualizarTitulos() {
-    document.querySelectorAll("#geracoes .card").forEach((card, index) => {
-        const numeroGeracao = index + 1;
+    document.querySelectorAll("#geracoes .card").forEach((card) => {
+
+        const numeroGeracao = Number(card.dataset.geracao) || 1;
         const parentescoTexto = parentesco[numeroGeracao] || "Descendente";
-        
-        card.querySelector(".title").innerText = `Geração ${numeroGeracao} - ${parentescoTexto}`;
+
+        card.querySelector(".title").innerText =
+            `Geração ${numeroGeracao} - ${parentescoTexto}`;
+
         card.dataset.parentesco = parentescoTexto;
     });
 }
@@ -311,168 +314,661 @@ function removerGeracao(btn) {
 }
 
 function toggleCasamento(selectElement) {
-    const dataInput = selectElement.parentElement.querySelector(".casamento-data");
-    if (selectElement.value === "sim") {
+
+    const card = selectElement.closest(".card");
+
+    const dataInput = card.querySelector(".casamento-data");
+    const conjugeInput = card.querySelector(".conjuge-nome");
+
+    if (selectElement.value === "casado") {
+
         dataInput.classList.remove("hidden");
+        conjugeInput.classList.remove("hidden");
+
     } else {
+
         dataInput.classList.add("hidden");
+        conjugeInput.classList.add("hidden");
+
         dataInput.value = "";
+        conjugeInput.value = "";
     }
 }
 
 function toggleRequerente(checkboxElement) {
-    const docSection = checkboxElement.closest(".card").querySelector(".doc-section");
+
+    const docSection =
+        checkboxElement.closest(".card").querySelector(".doc-section");
+
     if (checkboxElement.checked) {
+
         docSection.classList.remove("hidden");
+
     } else {
+
         docSection.classList.add("hidden");
+
         docSection.querySelector(".doc-tipo").value = "RG";
         docSection.querySelector(".doc-num").value = "";
         docSection.querySelector(".doc-validade").value = "";
     }
 }
 
-function addGeracao(){
-const div = document.createElement("div");
-div.className="card";
 
-div.innerHTML=`
-<div class="title"></div>
+/* Descobre qual é a próxima geração */
+function proximaGeracao() {
 
-<div class="row">
-<input placeholder="Nome completo" class="nome">
-<input placeholder="Data nascimento" class="nasc small">
-</div>
+    let maior = 0;
 
-<div class="row">
-<select onchange="toggleCasamento(this)" class="casamento-status">
-    <option value="nao">Solteiro(a)/Divorciado(a)</option>
-    <option value="sim">Casado(a)</option>
-</select>
-<input placeholder="Data casamento" class="casamento-data hidden">
+    document.querySelectorAll("#geracoes .card").forEach(card => {
 
-<label class="checkbox-container">
-    <input type="checkbox" class="is-requerente" onchange="toggleRequerente(this)"> É Requerente?
-</label>
-</div>
+        maior = Math.max(
+            maior,
+            Number(card.dataset.geracao) || 0
+        );
 
-<div class="doc-section hidden">
-    <div class="row">
-    <select class="doc-tipo">
-        <option value="RG">RG</option>
-        <option value="Passaporte">Passaporte</option>
-    </select>
-    <input placeholder="Número do Documento" class="doc-num">
-    <input placeholder="Validade do Doc." class="doc-validade small">
-    </div>
-</div>
-
-<button class="remove" onclick="removerGeracao(this)">Remover</button>
-`;
-
-document.getElementById("geracoes").appendChild(div);
-atualizarTitulos();
-}
-
-/* ================= PDF ULTRA CLEAN REFEITO ================= */
-function gerarPDF(){
-
-const { jsPDF } = window.jspdf;
-const pdf = new jsPDF('p', 'mm', 'a4');
-
-/* HEADER PRINCIPAL — REMOVIDO O BLOCO PRETO FORTE */
-pdf.setTextColor(17, 24, 37); 
-pdf.setFontSize(14);
-pdf.setFont("helvetica", "bold");
-pdf.text("EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA", 14, 16);
-
-/* DETALHE LEVE: LINHA TRIPLA CLEAN DA BANDEIRA DA ALEMANHA ABAIXO DO TÍTULO */
-pdf.setFillColor(17, 24, 37); // Preto
-pdf.rect(14, 20, 15, 0.8, 'F');
-pdf.setFillColor(221, 0, 0);  // Vermelho
-pdf.rect(29, 20, 15, 0.8, 'F');
-pdf.setFillColor(212, 175, 55); // Ouro
-pdf.rect(44, 20, 15, 0.8, 'F');
-
-let proximaY = 36;
-
-document.querySelectorAll("#geracoes .card").forEach((c, i)=>{
-    const numeroGeracao = i + 1;
-    const parentescoTexto = c.dataset.parentesco || "Descendente";
-    const nome = c.querySelector(".nome").value || "Nome não informado";
-    const nasc = c.querySelector(".nasc").value || "-";
-    const casou = c.querySelector(".casamento-status").value === "sim";
-    const dataCasamento = casou ? (c.querySelector(".casamento-data").value || "-") : "Não Casado";
-    const ehRequerente = c.querySelector(".is-requerente").checked;
-
-    let dadosFicha = [
-        ["Data de Nascimento", nasc],
-        ["Status de Casamento", casou ? `Casado(a) em ${dataCasamento}` : "Não Casado / Sem registro"],
-        ["É Requerente do Processo?", ehRequerente ? "Sim" : "Não"]
-    ];
-
-    if(ehRequerente) {
-        dadosFicha.push(["Tipo de Documento", c.querySelector(".doc-tipo").value]);
-        dadosFicha.push(["Número do Documento", c.querySelector(".doc-num").value || "-"]);
-        dadosFicha.push(["Validade do Documento", c.querySelector(".doc-validade").value || "-"]);
-    }
-
-    // Prevenção de quebra de página
-    let espacoNecessario = 25 + (dadosFicha.length * 7);
-    if (proximaY + espacoNecessario > 280) {
-        pdf.addPage();
-        proximaY = 25;
-    }
-
-    // TÍTULO DA GERAÇÃO
-    pdf.setFontSize(11);
-    pdf.setFont("helvetica", "bold");
-    pdf.setTextColor(17, 24, 37);
-    
-    let tituloTexto = `Geração ${numeroGeracao} - ${parentescoTexto}: ${nome}`;
-    if(ehRequerente) {
-        tituloTexto += "   [REQUERENTE DO PROCESSO]";
-    }
-    
-    pdf.text(tituloTexto, 14, proximaY);
-    
-    // Divisória sutil abaixo do título
-    pdf.setDrawColor(220, 225, 230);
-    pdf.setLineWidth(0.3);
-    pdf.line(14, proximaY + 2, 196, proximaY + 2);
-
-    // TABELA CLEAN
-    pdf.autoTable({
-        startY: proximaY + 4,
-        head: null, 
-        body: dadosFicha,
-        theme: "plain",
-        styles: {
-            fontSize: 9.5,
-            padding: 3.5,
-            textColor: [60, 65, 75]
-        },
-        columnStyles: {
-            0: { cellWidth: 55, fontStyle: 'bold', textColor: [100, 110, 120] },
-            1: { cellWidth: 'auto' }
-        },
-        margin: { left: 14, right: 14 },
-        didParseCell: function(data) {
-            data.cell.styles.lineWidth = { bottom: 0.1 };
-            data.cell.styles.lineColor = [230, 235, 240];
-            
-            if (ehRequerente && data.row.index === 2) {
-                data.cell.styles.fillColor = [255, 242, 242];
-                data.cell.styles.textColor = [190, 0, 0];
-            }
-        }
     });
 
-    proximaY = pdf.lastAutoTable.finalY + 14;
-});
-
-pdf.save("analise-cidadania-alema.pdf");
+    return maior + 1;
 }
+
+
+/* Cria uma pessoa dentro de uma determinada geração */
+function criarPessoa(numeroGeracao) {
+
+    const div = document.createElement("div");
+
+    div.className = "card";
+
+    div.dataset.geracao = numeroGeracao;
+
+    div.innerHTML = `
+    
+    <div class="title"></div>
+
+    <!-- NOME E DATA DE NASCIMENTO -->
+    <div class="row">
+
+        <input
+            placeholder="Nome completo"
+            class="nome"
+        >
+
+        <input
+            placeholder="Data nascimento"
+            class="nasc small"
+        >
+
+    </div>
+
+
+    <!-- LOCAL DE NASCIMENTO -->
+    <div class="row">
+
+        <input
+            placeholder="País de nascimento"
+            class="nasc-pais"
+        >
+
+        <input
+            placeholder="Estado de nascimento"
+            class="nasc-estado"
+        >
+
+        <input
+            placeholder="Cidade de nascimento"
+            class="nasc-cidade"
+        >
+
+    </div>
+
+
+    <!-- ESTADO CIVIL -->
+    <div class="row">
+
+        <select
+            onchange="toggleCasamento(this)"
+            class="casamento-status"
+        >
+
+            <option value="solteiro">
+                Solteiro(a)
+            </option>
+
+            <option value="divorciado">
+                Divorciado(a)
+            </option>
+
+            <option value="casado">
+                Casado(a)
+            </option>
+
+        </select>
+
+
+        <!-- APARECE SOMENTE SE CASADO -->
+        <input
+            placeholder="Nome do cônjuge"
+            class="conjuge-nome hidden"
+        >
+
+        <input
+            placeholder="Data casamento"
+            class="casamento-data hidden"
+        >
+
+
+        <label class="checkbox-container">
+
+            <input
+                type="checkbox"
+                class="is-requerente"
+                onchange="toggleRequerente(this)"
+            >
+
+            É Requerente?
+
+        </label>
+
+    </div>
+
+
+    <!-- DOCUMENTO DO REQUERENTE -->
+    <div class="doc-section hidden">
+
+        <div class="row">
+
+            <select class="doc-tipo">
+
+                <option value="RG">
+                    RG
+                </option>
+
+                <option value="Passaporte">
+                    Passaporte
+                </option>
+
+            </select>
+
+
+            <input
+                placeholder="Número do Documento"
+                class="doc-num"
+            >
+
+
+            <input
+                placeholder="Validade do Doc."
+                class="doc-validade small"
+            >
+
+        </div>
+
+    </div>
+
+
+    <!-- ADICIONAR IRMÃO / PESSOA NA MESMA GERAÇÃO -->
+    <div class="row">
+
+        <button
+            class="btn-add"
+            onclick="adicionarMesmaGeracao(this)"
+        >
+
+            + Adicionar pessoa na mesma geração
+
+        </button>
+
+    </div>
+
+
+    <button
+        class="remove"
+        onclick="removerGeracao(this)"
+    >
+
+        Remover
+
+    </button>
+
+    `;
+
+    document
+        .getElementById("geracoes")
+        .appendChild(div);
+
+    atualizarTitulos();
+}
+
+
+/* Adiciona uma nova geração */
+function addGeracao() {
+
+    criarPessoa(
+        proximaGeracao()
+    );
+
+}
+
+
+/* Adiciona outra pessoa mantendo a mesma geração */
+function adicionarMesmaGeracao(btn) {
+
+    const cardAtual =
+        btn.closest(".card");
+
+    const numeroGeracao =
+        Number(cardAtual.dataset.geracao);
+
+    criarPessoa(numeroGeracao);
+
+}
+
+
+/* ================= PDF ================= */
+
+function gerarPDF() {
+
+    const { jsPDF } = window.jspdf;
+
+    const pdf =
+        new jsPDF('p', 'mm', 'a4');
+
+
+    /* HEADER PRINCIPAL */
+
+    pdf.setTextColor(17, 24, 37);
+
+    pdf.setFontSize(14);
+
+    pdf.setFont("helvetica", "bold");
+
+    pdf.text(
+        "EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA",
+        14,
+        16
+    );
+
+
+    /* LINHA TRIPLA */
+
+    pdf.setFillColor(17, 24, 37);
+
+    pdf.rect(
+        14,
+        20,
+        15,
+        0.8,
+        'F'
+    );
+
+
+    pdf.setFillColor(221, 0, 0);
+
+    pdf.rect(
+        29,
+        20,
+        15,
+        0.8,
+        'F'
+    );
+
+
+    pdf.setFillColor(212, 175, 55);
+
+    pdf.rect(
+        44,
+        20,
+        15,
+        0.8,
+        'F'
+    );
+
+
+    let proximaY = 36;
+
+
+    document
+        .querySelectorAll("#geracoes .card")
+        .forEach((c) => {
+
+
+        /* GERAÇÃO */
+
+        const numeroGeracao =
+            Number(c.dataset.geracao) || 1;
+
+
+        const parentescoTexto =
+            c.dataset.parentesco || "Descendente";
+
+
+        /* DADOS PESSOAIS */
+
+        const nome =
+            c.querySelector(".nome").value ||
+            "Nome não informado";
+
+
+        const nasc =
+            c.querySelector(".nasc").value ||
+            "-";
+
+
+        /* LOCAL DE NASCIMENTO */
+
+        const paisNascimento =
+            c.querySelector(".nasc-pais").value ||
+            "-";
+
+
+        const estadoNascimento =
+            c.querySelector(".nasc-estado").value ||
+            "-";
+
+
+        const cidadeNascimento =
+            c.querySelector(".nasc-cidade").value ||
+            "-";
+
+
+        /* ESTADO CIVIL */
+
+        const statusCasamento =
+            c.querySelector(".casamento-status").value;
+
+
+        const casou =
+            statusCasamento === "casado";
+
+
+        const dataCasamento =
+            casou
+                ? (
+                    c.querySelector(".casamento-data").value ||
+                    "-"
+                  )
+                : "-";
+
+
+        const conjuge =
+            casou
+                ? (
+                    c.querySelector(".conjuge-nome").value ||
+                    "-"
+                  )
+                : "-";
+
+
+        const ehRequerente =
+            c.querySelector(".is-requerente").checked;
+
+
+        let statusTexto;
+
+
+        if (statusCasamento === "casado") {
+
+            statusTexto =
+                `Casado(a) em ${dataCasamento}`;
+
+        } else if (statusCasamento === "divorciado") {
+
+            statusTexto =
+                "Divorciado(a)";
+
+        } else {
+
+            statusTexto =
+                "Solteiro(a)";
+        }
+
+
+        /* DADOS DA FICHA */
+
+        let dadosFicha = [
+
+            [
+                "Data de Nascimento",
+                nasc
+            ],
+
+            [
+                "Local de Nascimento",
+                `${cidadeNascimento} - ${estadoNascimento} - ${paisNascimento}`
+            ],
+
+            [
+                "Status de Casamento",
+                statusTexto
+            ],
+
+            ...(casou
+                ? [
+                    [
+                        "Nome do Cônjuge",
+                        conjuge
+                    ]
+                ]
+                : []
+            ),
+
+            [
+                "É Requerente do Processo?",
+                ehRequerente
+                    ? "Sim"
+                    : "Não"
+            ]
+
+        ];
+
+
+        /* DOCUMENTOS */
+
+        if (ehRequerente) {
+
+            dadosFicha.push([
+                "Tipo de Documento",
+                c.querySelector(".doc-tipo").value
+            ]);
+
+
+            dadosFicha.push([
+                "Número do Documento",
+                c.querySelector(".doc-num").value || "-"
+            ]);
+
+
+            dadosFicha.push([
+                "Validade do Documento",
+                c.querySelector(".doc-validade").value || "-"
+            ]);
+
+        }
+
+
+        /* PREVENÇÃO DE QUEBRA DE PÁGINA */
+
+        let espacoNecessario =
+            25 + (dadosFicha.length * 7);
+
+
+        if (
+            proximaY + espacoNecessario > 280
+        ) {
+
+            pdf.addPage();
+
+            proximaY = 25;
+
+        }
+
+
+        /* TÍTULO DA GERAÇÃO */
+
+        pdf.setFontSize(11);
+
+        pdf.setFont(
+            "helvetica",
+            "bold"
+        );
+
+        pdf.setTextColor(
+            17,
+            24,
+            37
+        );
+
+
+        let tituloTexto =
+            `Geração ${numeroGeracao} - ${parentescoTexto}: ${nome}`;
+
+
+        if (ehRequerente) {
+
+            tituloTexto +=
+                "   [REQUERENTE DO PROCESSO]";
+
+        }
+
+
+        pdf.text(
+            tituloTexto,
+            14,
+            proximaY
+        );
+
+
+        /* DIVISÓRIA */
+
+        pdf.setDrawColor(
+            220,
+            225,
+            230
+        );
+
+        pdf.setLineWidth(
+            0.3
+        );
+
+        pdf.line(
+            14,
+            proximaY + 2,
+            196,
+            proximaY + 2
+        );
+
+
+        /* TABELA */
+
+        pdf.autoTable({
+
+            startY:
+                proximaY + 4,
+
+            head: null,
+
+            body:
+                dadosFicha,
+
+            theme:
+                "plain",
+
+            styles: {
+
+                fontSize:
+                    9.5,
+
+                padding:
+                    3.5,
+
+                textColor:
+                    [60, 65, 75]
+
+            },
+
+            columnStyles: {
+
+                0: {
+
+                    cellWidth:
+                        55,
+
+                    fontStyle:
+                        'bold',
+
+                    textColor:
+                        [100, 110, 120]
+
+                },
+
+                1: {
+
+                    cellWidth:
+                        'auto'
+
+                }
+
+            },
+
+            margin: {
+
+                left:
+                    14,
+
+                right:
+                    14
+
+            },
+
+            didParseCell:
+                function(data) {
+
+                    data.cell.styles.lineWidth =
+                        {
+                            bottom: 0.1
+                        };
+
+
+                    data.cell.styles.lineColor =
+                        [230, 235, 240];
+
+
+                    if (
+                        ehRequerente &&
+                        data.row.index === 2
+                    ) {
+
+                        data.cell.styles.fillColor =
+                            [255, 242, 242];
+
+
+                        data.cell.styles.textColor =
+                            [190, 0, 0];
+
+                    }
+
+                }
+
+        });
+
+
+        proximaY =
+            pdf.lastAutoTable.finalY + 14;
+
+    });
+
+
+    pdf.save(
+        "analise-cidadania-alema.pdf"
+    );
+
+}
+
+</script>
+
+</body>
+</html>
 </script>
 
 </body>
