@@ -269,6 +269,7 @@ button:hover {
 <body>
 
 <div class="container">
+
     <header>
         Check List Alemanha
         <div class="logo-badge">Cidadania4u</div>
@@ -276,71 +277,158 @@ button:hover {
 
     <!-- GERAÇÕES -->
     <div class="box">
+
         <h2>Árvore Genealógica (Gerações)</h2>
+
         <div id="geracoes"></div>
-        <button class="btn-add" onclick="addGeracao()">+ Adicionar Geração</button>
+
+        <button
+            class="btn-add"
+            onclick="addGeracao()"
+        >
+            + Adicionar Geração
+        </button>
+
     </div>
 
     <div class="footer">
-        <button class="btn-submit" onclick="gerarPDF()">GERAR PDF</button>
+
+        <button
+            class="btn-submit"
+            onclick="gerarPDF()"
+        >
+            GERAR PDF
+        </button>
+
     </div>
+
 </div>
 
+
 <script>
+
 const parentesco = {
+
     1: "Alemão(ã) Nato(a)",
+
     2: "Filho(a)",
+
     3: "Neto(a)",
+
     4: "Bisneto(a)",
+
     5: "Trineto(a)"
+
 };
 
+
+/* =========================================================
+   ATUALIZA OS TÍTULOS DAS GERAÇÕES
+   ========================================================= */
+
 function atualizarTitulos() {
-    document.querySelectorAll("#geracoes .card").forEach((card) => {
 
-        const numeroGeracao = Number(card.dataset.geracao) || 1;
-        const parentescoTexto = parentesco[numeroGeracao] || "Descendente";
+    document
+        .querySelectorAll("#geracoes .card")
+        .forEach((card) => {
 
-        card.querySelector(".title").innerText =
-            `Geração ${numeroGeracao} - ${parentescoTexto}`;
+            const numeroGeracao =
+                Number(card.dataset.geracao) || 1;
 
-        card.dataset.parentesco = parentescoTexto;
-    });
+            const subGeracao =
+                card.dataset.subgeracao || "";
+
+            const parentescoTexto =
+                parentesco[numeroGeracao] || "Descendente";
+
+
+            let identificacaoGeracao =
+                subGeracao
+                    ? `${numeroGeracao}.${subGeracao}`
+                    : `${numeroGeracao}`;
+
+
+            card.querySelector(".title").innerText =
+                `Geração ${identificacaoGeracao} - ${parentescoTexto}`;
+
+
+            card.dataset.parentesco =
+                parentescoTexto;
+
+        });
+
 }
+
+
+/* =========================================================
+   REMOVE UMA PESSOA
+   ========================================================= */
 
 function removerGeracao(btn) {
+
     btn.parentElement.remove();
+
     atualizarTitulos();
+
 }
+
+
+/* =========================================================
+   MOSTRA / ESCONDE CAMPOS DE CASAMENTO
+   ========================================================= */
 
 function toggleCasamento(selectElement) {
 
-    const card = selectElement.closest(".card");
+    const card =
+        selectElement.closest(".card");
 
-    const dataInput = card.querySelector(".casamento-data");
-    const conjugeInput = card.querySelector(".conjuge-nome");
 
-    if (selectElement.value === "casado") {
+    const dataInput =
+        card.querySelector(".casamento-data");
+
+
+    const conjugeInput =
+        card.querySelector(".conjuge-nome");
+
+
+    if (
+        selectElement.value === "casado"
+    ) {
 
         dataInput.classList.remove("hidden");
+
         conjugeInput.classList.remove("hidden");
 
     } else {
 
         dataInput.classList.add("hidden");
+
         conjugeInput.classList.add("hidden");
 
         dataInput.value = "";
+
         conjugeInput.value = "";
+
     }
+
 }
+
+
+/* =========================================================
+   MOSTRA / ESCONDE DOCUMENTOS DO REQUERENTE
+   ========================================================= */
 
 function toggleRequerente(checkboxElement) {
 
     const docSection =
-        checkboxElement.closest(".card").querySelector(".doc-section");
+        checkboxElement
+            .closest(".card")
+            .querySelector(".doc-section");
 
-    if (checkboxElement.checked) {
+
+    if (
+        checkboxElement.checked
+    ) {
 
         docSection.classList.remove("hidden");
 
@@ -348,200 +436,255 @@ function toggleRequerente(checkboxElement) {
 
         docSection.classList.add("hidden");
 
-        docSection.querySelector(".doc-tipo").value = "RG";
-        docSection.querySelector(".doc-num").value = "";
-        docSection.querySelector(".doc-validade").value = "";
+        docSection
+            .querySelector(".doc-tipo")
+            .value = "RG";
+
+        docSection
+            .querySelector(".doc-num")
+            .value = "";
+
+        docSection
+            .querySelector(".doc-validade")
+            .value = "";
+
     }
+
 }
 
 
-/* Descobre qual é a próxima geração */
+/* =========================================================
+   DESCOBRE A PRÓXIMA GERAÇÃO
+   ========================================================= */
+
 function proximaGeracao() {
 
     let maior = 0;
 
-    document.querySelectorAll("#geracoes .card").forEach(card => {
 
-        maior = Math.max(
-            maior,
-            Number(card.dataset.geracao) || 0
-        );
+    document
+        .querySelectorAll("#geracoes .card")
+        .forEach(card => {
 
-    });
+            maior =
+                Math.max(
+                    maior,
+                    Number(card.dataset.geracao) || 0
+                );
+
+        });
+
 
     return maior + 1;
+
 }
 
 
-/* Cria uma pessoa dentro de uma determinada geração */
-function criarPessoa(numeroGeracao) {
+/* =========================================================
+   CRIA UMA PESSOA
+   ========================================================= */
 
-    const div = document.createElement("div");
+function criarPessoa(
+    numeroGeracao,
+    subGeracao = null
+) {
 
-    div.className = "card";
+    const div =
+        document.createElement("div");
 
-    div.dataset.geracao = numeroGeracao;
+
+    div.className =
+        "card";
+
+
+    div.dataset.geracao =
+        numeroGeracao;
+
+
+    div.dataset.subgeracao =
+        subGeracao || "";
+
 
     div.innerHTML = `
-    
-    <div class="title"></div>
 
-    <!-- NOME E DATA DE NASCIMENTO -->
-    <div class="row">
-
-        <input
-            placeholder="Nome completo"
-            class="nome"
-        >
-
-        <input
-            placeholder="Data nascimento"
-            class="nasc small"
-        >
-
-    </div>
+        <div class="title"></div>
 
 
-    <!-- LOCAL DE NASCIMENTO -->
-    <div class="row">
-
-        <input
-            placeholder="País de nascimento"
-            class="nasc-pais"
-        >
-
-        <input
-            placeholder="Estado de nascimento"
-            class="nasc-estado"
-        >
-
-        <input
-            placeholder="Cidade de nascimento"
-            class="nasc-cidade"
-        >
-
-    </div>
-
-
-    <!-- ESTADO CIVIL -->
-    <div class="row">
-
-        <select
-            onchange="toggleCasamento(this)"
-            class="casamento-status"
-        >
-
-            <option value="solteiro">
-                Solteiro(a)
-            </option>
-
-            <option value="divorciado">
-                Divorciado(a)
-            </option>
-
-            <option value="casado">
-                Casado(a)
-            </option>
-
-        </select>
-
-
-        <!-- APARECE SOMENTE SE CASADO -->
-        <input
-            placeholder="Nome do cônjuge"
-            class="conjuge-nome hidden"
-        >
-
-        <input
-            placeholder="Data casamento"
-            class="casamento-data hidden"
-        >
-
-
-        <label class="checkbox-container">
-
-            <input
-                type="checkbox"
-                class="is-requerente"
-                onchange="toggleRequerente(this)"
-            >
-
-            É Requerente?
-
-        </label>
-
-    </div>
-
-
-    <!-- DOCUMENTO DO REQUERENTE -->
-    <div class="doc-section hidden">
+        <!-- NOME E DATA DE NASCIMENTO -->
 
         <div class="row">
 
-            <select class="doc-tipo">
+            <input
+                placeholder="Nome completo"
+                class="nome"
+            >
 
-                <option value="RG">
-                    RG
+            <input
+                placeholder="Data nascimento"
+                class="nasc small"
+            >
+
+        </div>
+
+
+        <!-- LOCAL DE NASCIMENTO -->
+
+        <div class="row">
+
+            <input
+                placeholder="País de nascimento"
+                class="nasc-pais"
+            >
+
+            <input
+                placeholder="Estado de nascimento"
+                class="nasc-estado"
+            >
+
+            <input
+                placeholder="Cidade de nascimento"
+                class="nasc-cidade"
+            >
+
+        </div>
+
+
+        <!-- ESTADO CIVIL -->
+
+        <div class="row">
+
+            <select
+                onchange="toggleCasamento(this)"
+                class="casamento-status"
+            >
+
+                <option value="solteiro">
+                    Solteiro(a)
                 </option>
 
-                <option value="Passaporte">
-                    Passaporte
+                <option value="divorciado">
+                    Divorciado(a)
+                </option>
+
+                <option value="casado">
+                    Casado(a)
                 </option>
 
             </select>
 
 
+            <!-- NOME DO CÔNJUGE -->
+
             <input
-                placeholder="Número do Documento"
-                class="doc-num"
+                placeholder="Nome do cônjuge"
+                class="conjuge-nome hidden"
             >
 
 
+            <!-- DATA DO CASAMENTO -->
+
             <input
-                placeholder="Validade do Doc."
-                class="doc-validade small"
+                placeholder="Data casamento"
+                class="casamento-data hidden"
             >
+
+
+            <!-- REQUERENTE -->
+
+            <label class="checkbox-container">
+
+                <input
+                    type="checkbox"
+                    class="is-requerente"
+                    onchange="toggleRequerente(this)"
+                >
+
+                É Requerente?
+
+            </label>
 
         </div>
 
-    </div>
+
+        <!-- DOCUMENTO -->
+
+        <div class="doc-section hidden">
+
+            <div class="row">
+
+                <select class="doc-tipo">
+
+                    <option value="RG">
+                        RG
+                    </option>
+
+                    <option value="Passaporte">
+                        Passaporte
+                    </option>
+
+                </select>
 
 
-    <!-- ADICIONAR IRMÃO / PESSOA NA MESMA GERAÇÃO -->
-    <div class="row">
+                <input
+                    placeholder="Número do Documento"
+                    class="doc-num"
+                >
+
+
+                <input
+                    placeholder="Validade do Doc."
+                    class="doc-validade small"
+                >
+
+            </div>
+
+        </div>
+
+
+        <!-- MESMA GERAÇÃO -->
+
+        <div class="row">
+
+            <button
+                class="btn-add"
+                onclick="adicionarMesmaGeracao(this)"
+            >
+
+                + Adicionar pessoa na mesma geração
+
+            </button>
+
+        </div>
+
+
+        <!-- REMOVER -->
 
         <button
-            class="btn-add"
-            onclick="adicionarMesmaGeracao(this)"
+            class="remove"
+            onclick="removerGeracao(this)"
         >
 
-            + Adicionar pessoa na mesma geração
+            Remover
 
         </button>
 
-    </div>
-
-
-    <button
-        class="remove"
-        onclick="removerGeracao(this)"
-    >
-
-        Remover
-
-    </button>
-
     `;
+
 
     document
         .getElementById("geracoes")
         .appendChild(div);
 
+
     atualizarTitulos();
+
 }
 
 
-/* Adiciona uma nova geração */
+/* =========================================================
+   ADICIONA NOVA GERAÇÃO
+   ========================================================= */
+
 function addGeracao() {
 
     criarPessoa(
@@ -551,37 +694,98 @@ function addGeracao() {
 }
 
 
-/* Adiciona outra pessoa mantendo a mesma geração */
+/* =========================================================
+   ADICIONA PESSOA NA MESMA GERAÇÃO
+   ========================================================= */
+
 function adicionarMesmaGeracao(btn) {
 
     const cardAtual =
         btn.closest(".card");
 
-    const numeroGeracao =
-        Number(cardAtual.dataset.geracao);
 
-    criarPessoa(numeroGeracao);
+    const numeroGeracao =
+        Number(
+            cardAtual.dataset.geracao
+        );
+
+
+    /*
+       Conta quantas pessoas já existem
+       nessa mesma geração.
+    */
+
+    const pessoasMesmaGeracao =
+        document.querySelectorAll(
+            `#geracoes .card[data-geracao="${numeroGeracao}"]`
+        ).length;
+
+
+    /*
+       A primeira pessoa é:
+
+       Geração 2
+
+       A segunda:
+
+       Geração 2.1
+
+       A terceira:
+
+       Geração 2.2
+
+       etc.
+    */
+
+    const subGeracao =
+        pessoasMesmaGeracao;
+
+
+    criarPessoa(
+        numeroGeracao,
+        subGeracao
+    );
 
 }
 
 
-/* ================= PDF ================= */
+/* =========================================================
+   GERAR PDF
+   ========================================================= */
 
 function gerarPDF() {
 
-    const { jsPDF } = window.jspdf;
+    const { jsPDF } =
+        window.jspdf;
+
 
     const pdf =
-        new jsPDF('p', 'mm', 'a4');
+        new jsPDF(
+            'p',
+            'mm',
+            'a4'
+        );
 
 
     /* HEADER PRINCIPAL */
 
-    pdf.setTextColor(17, 24, 37);
+    pdf.setTextColor(
+        17,
+        24,
+        37
+    );
 
-    pdf.setFontSize(14);
 
-    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(
+        14
+    );
+
+
+    pdf.setFont(
+        "helvetica",
+        "bold"
+    );
+
 
     pdf.text(
         "EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA",
@@ -590,9 +794,14 @@ function gerarPDF() {
     );
 
 
-    /* LINHA TRIPLA */
+    /* DETALHE DA BANDEIRA */
 
-    pdf.setFillColor(17, 24, 37);
+    pdf.setFillColor(
+        17,
+        24,
+        37
+    );
+
 
     pdf.rect(
         14,
@@ -603,7 +812,12 @@ function gerarPDF() {
     );
 
 
-    pdf.setFillColor(221, 0, 0);
+    pdf.setFillColor(
+        221,
+        0,
+        0
+    );
+
 
     pdf.rect(
         29,
@@ -614,7 +828,12 @@ function gerarPDF() {
     );
 
 
-    pdf.setFillColor(212, 175, 55);
+    pdf.setFillColor(
+        212,
+        175,
+        55
+    );
+
 
     pdf.rect(
         44,
@@ -625,339 +844,440 @@ function gerarPDF() {
     );
 
 
-    let proximaY = 36;
+    let proximaY =
+        36;
 
+
+    /* =====================================================
+       PERCORRE TODAS AS PESSOAS
+       ===================================================== */
 
     document
         .querySelectorAll("#geracoes .card")
         .forEach((c) => {
 
 
-        /* GERAÇÃO */
+            /* GERAÇÃO */
 
-        const numeroGeracao =
-            Number(c.dataset.geracao) || 1;
-
-
-        const parentescoTexto =
-            c.dataset.parentesco || "Descendente";
+            const numeroGeracao =
+                Number(
+                    c.dataset.geracao
+                ) || 1;
 
 
-        /* DADOS PESSOAIS */
-
-        const nome =
-            c.querySelector(".nome").value ||
-            "Nome não informado";
+            const subGeracao =
+                c.dataset.subgeracao || "";
 
 
-        const nasc =
-            c.querySelector(".nasc").value ||
-            "-";
+            const parentescoTexto =
+                c.dataset.parentesco ||
+                "Descendente";
 
 
-        /* LOCAL DE NASCIMENTO */
+            /* NOME */
 
-        const paisNascimento =
-            c.querySelector(".nasc-pais").value ||
-            "-";
-
-
-        const estadoNascimento =
-            c.querySelector(".nasc-estado").value ||
-            "-";
+            const nome =
+                c.querySelector(".nome").value ||
+                "Nome não informado";
 
 
-        const cidadeNascimento =
-            c.querySelector(".nasc-cidade").value ||
-            "-";
+            /* NASCIMENTO */
+
+            const nasc =
+                c.querySelector(".nasc").value ||
+                "-";
 
 
-        /* ESTADO CIVIL */
+            /* LOCAL DE NASCIMENTO */
 
-        const statusCasamento =
-            c.querySelector(".casamento-status").value;
-
-
-        const casou =
-            statusCasamento === "casado";
+            const paisNascimento =
+                c.querySelector(".nasc-pais").value ||
+                "-";
 
 
-        const dataCasamento =
-            casou
-                ? (
-                    c.querySelector(".casamento-data").value ||
-                    "-"
-                  )
-                : "-";
+            const estadoNascimento =
+                c.querySelector(".nasc-estado").value ||
+                "-";
 
 
-        const conjuge =
-            casou
-                ? (
-                    c.querySelector(".conjuge-nome").value ||
-                    "-"
-                  )
-                : "-";
+            const cidadeNascimento =
+                c.querySelector(".nasc-cidade").value ||
+                "-";
 
 
-        const ehRequerente =
-            c.querySelector(".is-requerente").checked;
+            /* ESTADO CIVIL */
+
+            const statusCasamento =
+                c.querySelector(".casamento-status").value;
 
 
-        let statusTexto;
+            const casou =
+                statusCasamento === "casado";
 
 
-        if (statusCasamento === "casado") {
-
-            statusTexto =
-                `Casado(a) em ${dataCasamento}`;
-
-        } else if (statusCasamento === "divorciado") {
-
-            statusTexto =
-                "Divorciado(a)";
-
-        } else {
-
-            statusTexto =
-                "Solteiro(a)";
-        }
+            const dataCasamento =
+                casou
+                    ? (
+                        c.querySelector(".casamento-data").value ||
+                        "-"
+                    )
+                    : "-";
 
 
-        /* DADOS DA FICHA */
+            const conjuge =
+                casou
+                    ? (
+                        c.querySelector(".conjuge-nome").value ||
+                        "-"
+                    )
+                    : "-";
 
-        let dadosFicha = [
 
-            [
-                "Data de Nascimento",
-                nasc
-            ],
+            /* REQUERENTE */
 
-            [
-                "Local de Nascimento",
-                `${cidadeNascimento} - ${estadoNascimento} - ${paisNascimento}`
-            ],
+            const ehRequerente =
+                c.querySelector(
+                    ".is-requerente"
+                ).checked;
 
-            [
-                "Status de Casamento",
-                statusTexto
-            ],
 
-            ...(casou
-                ? [
-                    [
-                        "Nome do Cônjuge",
-                        conjuge
-                    ]
+            /* TEXTO DO ESTADO CIVIL */
+
+            let statusTexto;
+
+
+            if (
+                statusCasamento === "casado"
+            ) {
+
+                statusTexto =
+                    `Casado(a) em ${dataCasamento}`;
+
+            }
+
+            else if (
+                statusCasamento === "divorciado"
+            ) {
+
+                statusTexto =
+                    "Divorciado(a)";
+
+            }
+
+            else {
+
+                statusTexto =
+                    "Solteiro(a)";
+
+            }
+
+
+            /* =================================================
+               DADOS DA FICHA
+               ================================================= */
+
+            let dadosFicha = [
+
+                [
+                    "Data de Nascimento",
+                    nasc
+                ],
+
+                [
+                    "Local de Nascimento",
+                    `${cidadeNascimento} - ${estadoNascimento} - ${paisNascimento}`
+                ],
+
+                [
+                    "Status de Casamento",
+                    statusTexto
                 ]
-                : []
-            ),
 
-            [
+            ];
+
+
+            /*
+               Só mostra o nome do cônjuge
+               quando a pessoa é casada.
+            */
+
+            if (
+                casou
+            ) {
+
+                dadosFicha.push([
+                    "Nome do Cônjuge",
+                    conjuge
+                ]);
+
+            }
+
+
+            dadosFicha.push([
                 "É Requerente do Processo?",
                 ehRequerente
                     ? "Sim"
                     : "Não"
-            ]
-
-        ];
-
-
-        /* DOCUMENTOS */
-
-        if (ehRequerente) {
-
-            dadosFicha.push([
-                "Tipo de Documento",
-                c.querySelector(".doc-tipo").value
             ]);
 
 
-            dadosFicha.push([
-                "Número do Documento",
-                c.querySelector(".doc-num").value || "-"
-            ]);
+            /* =================================================
+               DOCUMENTOS DO REQUERENTE
+               ================================================= */
+
+            if (
+                ehRequerente
+            ) {
+
+                dadosFicha.push([
+                    "Tipo de Documento",
+                    c.querySelector(
+                        ".doc-tipo"
+                    ).value
+                ]);
 
 
-            dadosFicha.push([
-                "Validade do Documento",
-                c.querySelector(".doc-validade").value || "-"
-            ]);
-
-        }
-
-
-        /* PREVENÇÃO DE QUEBRA DE PÁGINA */
-
-        let espacoNecessario =
-            25 + (dadosFicha.length * 7);
+                dadosFicha.push([
+                    "Número do Documento",
+                    c.querySelector(
+                        ".doc-num"
+                    ).value || "-"
+                ]);
 
 
-        if (
-            proximaY + espacoNecessario > 280
-        ) {
+                dadosFicha.push([
+                    "Validade do Documento",
+                    c.querySelector(
+                        ".doc-validade"
+                    ).value || "-"
+                ]);
 
-            pdf.addPage();
-
-            proximaY = 25;
-
-        }
-
-
-        /* TÍTULO DA GERAÇÃO */
-
-        pdf.setFontSize(11);
-
-        pdf.setFont(
-            "helvetica",
-            "bold"
-        );
-
-        pdf.setTextColor(
-            17,
-            24,
-            37
-        );
+            }
 
 
-        let tituloTexto =
-            `Geração ${numeroGeracao} - ${parentescoTexto}: ${nome}`;
+            /* =================================================
+               PREVENÇÃO DE QUEBRA DE PÁGINA
+               ================================================= */
+
+            let espacoNecessario =
+                25 +
+                (
+                    dadosFicha.length *
+                    7
+                );
 
 
-        if (ehRequerente) {
+            if (
+                proximaY +
+                espacoNecessario >
+                280
+            ) {
 
-            tituloTexto +=
-                "   [REQUERENTE DO PROCESSO]";
+                pdf.addPage();
 
-        }
+                proximaY =
+                    25;
 
-
-        pdf.text(
-            tituloTexto,
-            14,
-            proximaY
-        );
-
-
-        /* DIVISÓRIA */
-
-        pdf.setDrawColor(
-            220,
-            225,
-            230
-        );
-
-        pdf.setLineWidth(
-            0.3
-        );
-
-        pdf.line(
-            14,
-            proximaY + 2,
-            196,
-            proximaY + 2
-        );
+            }
 
 
-        /* TABELA */
+            /* =================================================
+               TÍTULO
+               ================================================= */
 
-        pdf.autoTable({
+            pdf.setFontSize(
+                11
+            );
 
-            startY:
-                proximaY + 4,
 
-            head: null,
+            pdf.setFont(
+                "helvetica",
+                "bold"
+            );
 
-            body:
-                dadosFicha,
 
-            theme:
-                "plain",
+            pdf.setTextColor(
+                17,
+                24,
+                37
+            );
 
-            styles: {
 
-                fontSize:
-                    9.5,
+            /*
+               Se for a primeira pessoa:
 
-                padding:
-                    3.5,
+               Geração 2
 
-                textColor:
-                    [60, 65, 75]
+               Se for uma pessoa da mesma geração:
 
-            },
+               Geração 2.1
+               Geração 2.2
+               Geração 2.3
+            */
 
-            columnStyles: {
+            let identificacaoGeracao =
+                subGeracao
+                    ? `${numeroGeracao}.${subGeracao}`
+                    : `${numeroGeracao}`;
 
-                0: {
 
-                    cellWidth:
-                        55,
+            let tituloTexto =
+                `Geração ${identificacaoGeracao} - ${parentescoTexto}: ${nome}`;
 
-                    fontStyle:
-                        'bold',
+
+            if (
+                ehRequerente
+            ) {
+
+                tituloTexto +=
+                    "   [REQUERENTE DO PROCESSO]";
+
+            }
+
+
+            pdf.text(
+                tituloTexto,
+                14,
+                proximaY
+            );
+
+
+            /* =================================================
+               DIVISÓRIA
+               ================================================= */
+
+            pdf.setDrawColor(
+                220,
+                225,
+                230
+            );
+
+
+            pdf.setLineWidth(
+                0.3
+            );
+
+
+            pdf.line(
+                14,
+                proximaY + 2,
+                196,
+                proximaY + 2
+            );
+
+
+            /* =================================================
+               TABELA
+               ================================================= */
+
+            pdf.autoTable({
+
+                startY:
+                    proximaY + 4,
+
+                head:
+                    null,
+
+                body:
+                    dadosFicha,
+
+                theme:
+                    "plain",
+
+                styles: {
+
+                    fontSize:
+                        9.5,
+
+                    padding:
+                        3.5,
 
                     textColor:
-                        [100, 110, 120]
+                        [
+                            60,
+                            65,
+                            75
+                        ]
 
                 },
 
-                1: {
+                columnStyles: {
 
-                    cellWidth:
-                        'auto'
+                    0: {
 
-                }
+                        cellWidth:
+                            55,
 
-            },
+                        fontStyle:
+                            'bold',
 
-            margin: {
+                        textColor:
+                            [
+                                100,
+                                110,
+                                120
+                            ]
 
-                left:
-                    14,
+                    },
 
-                right:
-                    14
+                    1: {
 
-            },
-
-            didParseCell:
-                function(data) {
-
-                    data.cell.styles.lineWidth =
-                        {
-                            bottom: 0.1
-                        };
-
-
-                    data.cell.styles.lineColor =
-                        [230, 235, 240];
-
-
-                    if (
-                        ehRequerente &&
-                        data.row.index === 2
-                    ) {
-
-                        data.cell.styles.fillColor =
-                            [255, 242, 242];
-
-
-                        data.cell.styles.textColor =
-                            [190, 0, 0];
+                        cellWidth:
+                            'auto'
 
                     }
 
-                }
+                },
+
+                margin: {
+
+                    left:
+                        14,
+
+                    right:
+                        14
+
+                },
+
+                /*
+                   Não há mais nenhuma regra
+                   deixando o Status de Casamento
+                   em vermelho.
+                */
+
+                didParseCell:
+                    function(data) {
+
+                        data.cell.styles.lineWidth =
+                            {
+                                bottom: 0.1
+                            };
+
+
+                        data.cell.styles.lineColor =
+                            [
+                                230,
+                                235,
+                                240
+                            ];
+
+                    }
+
+            });
+
+
+            /* PRÓXIMA POSIÇÃO */
+
+            proximaY =
+                pdf.lastAutoTable.finalY +
+                14;
 
         });
 
 
-        proximaY =
-            pdf.lastAutoTable.finalY + 14;
-
-    });
-
+    /* =====================================================
+       SALVAR
+       ===================================================== */
 
     pdf.save(
         "analise-cidadania-alema.pdf"
@@ -965,10 +1285,6 @@ function gerarPDF() {
 
 }
 
-</script>
-
-</body>
-</html>
 </script>
 
 </body>
