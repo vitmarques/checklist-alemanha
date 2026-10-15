@@ -118,7 +118,7 @@ h2 {
 
 .row:last-of-type { margin-bottom: 0; }
 
-input, select {
+input, select, textarea {
   flex: 1;
   min-width: 0;
   padding: 14px 18px;
@@ -129,18 +129,31 @@ input, select {
   font-family: inherit;
   font-size: 14px;
   font-weight: 500;
-  height: 52px;
   transition: all .2s ease;
 }
 
-input:focus, select:focus {
+input, select {
+  height: 52px;
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  resize: vertical;
+  line-height: 1.6;
+}
+
+input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--germany-black);
   background-color: #fff;
   box-shadow: 0 0 0 4px rgba(17,24,39,.05);
 }
 
-input::placeholder { color: #a0aec0; }
+input::placeholder, textarea::placeholder {
+  color: #a0aec0;
+}
+
 .small { flex: .6; }
 
 .checkbox-container {
@@ -332,6 +345,28 @@ button:hover {
   transform: none;
 }
 
+.observacoes-section {
+  margin-top: 25px;
+  padding: 22px;
+  border: 1px solid #e6eaf0;
+  border-radius: var(--border-radius-input);
+  background: #fbfcfd;
+}
+
+.observacoes-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--germany-black);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.observacoes-section textarea {
+  display: block;
+  background: #fff;
+}
+
 @media (max-width: 700px) {
   body { padding: 15px 10px; }
   .container { padding: 22px 16px; }
@@ -347,11 +382,13 @@ button:hover {
     align-items: stretch;
     margin-bottom: 12px;
   }
-  .row input, .row select, .row .checkbox-container {
+  .row input, .row select, .row textarea,
+  .row .checkbox-container {
     width: 100%;
     flex: auto;
   }
-  .divergencia-section { padding: 15px; }
+  .divergencia-section,
+  .observacoes-section { padding: 15px; }
 }
 </style>
 </head>
@@ -472,6 +509,14 @@ function adicionarDivergencia(btn) {
         class="divergencia-documento"
         placeholder="Documento (ex.: Certidão de nascimento)"
         aria-label="Documento da divergência"
+      >
+    </div>
+
+    <div class="row">
+      <input
+        class="divergencia-dado"
+        placeholder="Qual dado está errado? (ex.: sobrenome)"
+        aria-label="Dado incorreto"
       >
     </div>
 
@@ -636,6 +681,15 @@ function criarPessoa(numeroGeracao, subGeracao = null) {
       </div>
     </section>
 
+    <section class="observacoes-section">
+      <div class="observacoes-heading">Observações</div>
+      <textarea
+        class="observacoes"
+        placeholder="Adicione observações sobre a documentação, o processo ou qualquer informação relevante..."
+        aria-label="Observações da pessoa"
+      ></textarea>
+    </section>
+
     <div class="row" style="margin-top:20px">
       <button
         class="btn-add"
@@ -708,7 +762,7 @@ function gerarPDF() {
   pdf.setFont("helvetica", "bold");
 
   pdf.text(
-    "EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA",
+    "EXTRATO DA REVISAO DO PROCESSO DE CIDADANIA",
     14,
     16
   );
@@ -888,7 +942,7 @@ function gerarPDF() {
     pdf.setTextColor(17, 24, 37);
 
     pdf.text(
-      "Análise Documental – Divergências Identificadas",
+      "Analise Documental - Divergencias Identificadas",
       margemEsquerda,
       y
     );
@@ -896,6 +950,8 @@ function gerarPDF() {
     y += 6;
 
     if (statusDivergencia === "nao") {
+      garantirEspaco(10);
+
       pdf.setFont("helvetica", "normal");
       pdf.setFontSize(9.5);
       pdf.setTextColor(60, 65, 75);
@@ -931,6 +987,10 @@ function gerarPDF() {
             item.querySelector(".divergencia-documento").value.trim() ||
             "Não informado";
 
+          const dadoIncorreto =
+            item.querySelector(".divergencia-dado").value.trim() ||
+            "Não informado";
+
           const consta =
             item.querySelector(".divergencia-consta").value.trim() ||
             "Não informado";
@@ -941,11 +1001,12 @@ function gerarPDF() {
 
           const tabelaDivergencia = [
             [`Divergência ${index + 1} — Documento`, documento],
+            ["Dado incorreto", dadoIncorreto],
             ["Como consta no documento", consta],
             ["Como deveria constar", deveria]
           ];
 
-          // O AutoTable ajusta o conteúdo e administra as quebras de página.
+          // Cada divergência pode ser de um documento diferente.
           pdf.autoTable({
             startY: y,
             head: [],
@@ -992,7 +1053,69 @@ function gerarPDF() {
       }
     }
 
-    y += 8;
+    // Campo de observações da pessoa.
+    const observacoes =
+      c.querySelector(".observacoes").value.trim();
+
+    garantirEspaco(20);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.setTextColor(17, 24, 37);
+
+    pdf.text("Observações", margemEsquerda, y);
+    y += 5;
+
+    if (observacoes) {
+      pdf.autoTable({
+        startY: y,
+        head: [],
+        body: [[observacoes]],
+        theme: "grid",
+
+        styles: {
+          font: "helvetica",
+          fontSize: 9.5,
+          cellPadding: 4,
+          overflow: "linebreak",
+          textColor: [60, 65, 75],
+          lineColor: [225, 230, 235],
+          lineWidth: 0.2,
+          valign: "top"
+        },
+
+        columnStyles: {
+          0: {
+            cellWidth: "auto"
+          }
+        },
+
+        margin: {
+          left: margemEsquerda,
+          right: margemDireita,
+          bottom: 18
+        },
+
+        pageBreak: "auto",
+        rowPageBreak: "auto"
+      });
+
+      y = pdf.lastAutoTable.finalY + 8;
+    } else {
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(120, 125, 135);
+
+      pdf.text(
+        "Nenhuma observação registrada.",
+        margemEsquerda,
+        y
+      );
+
+      y += 12;
+    }
+
+    y += 4;
   });
 
   pdf.save("analise-cidadania-alema.pdf");
