@@ -1,1291 +1,1005 @@
+
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
 <meta charset="UTF-8">
 <title>Cidadania Alemã PRO</title>
-
-<!-- Importação de fonte moderna idêntica ao padrão clean de checklists modernos -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700&display=swap" rel="stylesheet">
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
 <style>
 :root {
-    --bg-global: #f4f6f8;
-    --bg-container: #ffffff;
-    
-    /* Paleta Alemanha Premium */
-    --germany-black: #111827;
-    --germany-red: #DD0000;
-    --germany-gold: #D4AF37;
-    --germany-gold-light: rgba(212, 175, 55, 0.1);
-    
-    --text-label: #5e6a75;
-    --text-input: #1f2937;
-    --bg-input: #f8f9fa;
-    --border-radius-main: 16px;
-    --border-radius-input: 12px;
+  --bg-global: #f4f6f8;
+  --bg-container: #ffffff;
+  --germany-black: #111827;
+  --germany-red: #DD0000;
+  --germany-gold: #D4AF37;
+  --germany-gold-light: rgba(212, 175, 55, 0.1);
+  --text-label: #5e6a75;
+  --text-input: #1f2937;
+  --bg-input: #f8f9fa;
+  --border-radius-main: 16px;
+  --border-radius-input: 12px;
 }
 
+* { box-sizing: border-box; }
+
 body {
-    font-family: 'Montserrat', sans-serif;
-    margin: 0;
-    background-color: var(--bg-global);
-    color: var(--text-input);
-    padding: 40px 20px;
-    -webkit-font-smoothing: antialiased;
+  font-family: 'Montserrat', sans-serif;
+  margin: 0;
+  background-color: var(--bg-global);
+  color: var(--text-input);
+  padding: 40px 20px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .container {
-    max-width: 950px;
-    margin: 0 auto;
-    background: var(--bg-container);
-    padding: 40px;
-    border-radius: var(--border-radius-main);
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.03);
+  max-width: 950px;
+  margin: 0 auto;
+  background: var(--bg-container);
+  padding: 40px;
+  border-radius: var(--border-radius-main);
+  box-shadow: 0 10px 30px rgba(0,0,0,.03);
 }
 
 header {
-    font-size: 26px;
-    font-weight: 700;
-    color: var(--germany-black);
-    margin-bottom: 35px;
-    border-bottom: 2px solid #f0f2f5;
-    padding-bottom: 20px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--germany-black);
+  margin-bottom: 35px;
+  border-bottom: 2px solid #f0f2f5;
+  padding-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
 }
 
 .logo-badge {
-    background: var(--germany-gold-light);
-    color: #b38f1d;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    font-size: 12px;
-    padding: 6px 16px;
-    border-radius: 20px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+  background: var(--germany-gold-light);
+  color: #b38f1d;
+  border: 1px solid rgba(212,175,55,.3);
+  font-size: 12px;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-weight: 700;
+  letter-spacing: .5px;
+  white-space: nowrap;
 }
 
 h2 {
-    font-size: 13px;
-    text-transform: uppercase;
-    letter-spacing: 1.2px;
-    color: var(--germany-red);
-    margin-top: 0;
-    margin-bottom: 25px;
-    font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.2px;
+  color: var(--germany-red);
+  margin-top: 0;
+  margin-bottom: 25px;
+  font-weight: 700;
 }
 
 .card {
-    border: 1px solid #eef0f3;
-    padding: 25px;
-    border-radius: var(--border-radius-main);
-    margin-bottom: 25px;
-    background: #ffffff;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.01);
+  border: 1px solid #eef0f3;
+  padding: 25px;
+  border-radius: var(--border-radius-main);
+  margin-bottom: 25px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgba(0,0,0,.01);
 }
 
 .title {
-    font-weight: 700;
-    font-size: 15px;
-    margin-bottom: 20px;
-    color: var(--germany-black);
-    display: flex;
-    align-items: center;
-    gap: 8px;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 20px;
+  color: var(--germany-black);
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .title::before {
-    content: '';
-    display: inline-block;
-    width: 4px;
-    height: 16px;
-    background: var(--germany-red);
-    border-radius: 2px;
+  content: '';
+  display: inline-block;
+  width: 4px;
+  height: 16px;
+  background: var(--germany-red);
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .row {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    align-items: center;
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+  align-items: center;
 }
 
-.row:last-of-type {
-    margin-bottom: 0;
-}
+.row:last-of-type { margin-bottom: 0; }
 
 input, select {
-    flex: 1;
-    padding: 14px 18px;
-    border-radius: var(--border-radius-input);
-    border: 1px solid #e2e8f0;
-    background-color: var(--bg-input);
-    color: var(--text-input);
-    font-family: inherit;
-    font-size: 14px;
-    font-weight: 500;
-    height: 52px;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
+  flex: 1;
+  min-width: 0;
+  padding: 14px 18px;
+  border-radius: var(--border-radius-input);
+  border: 1px solid #e2e8f0;
+  background-color: var(--bg-input);
+  color: var(--text-input);
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  height: 52px;
+  transition: all .2s ease;
 }
 
 input:focus, select:focus {
-    outline: none;
-    border-color: var(--germany-black);
-    background-color: #ffffff;
-    box-shadow: 0 0 0 4px rgba(17, 24, 39, 0.05);
+  outline: none;
+  border-color: var(--germany-black);
+  background-color: #fff;
+  box-shadow: 0 0 0 4px rgba(17,24,39,.05);
 }
 
-input::placeholder {
-    color: #a0aec0;
-}
-
-.small {
-    flex: 0.6;
-}
+input::placeholder { color: #a0aec0; }
+.small { flex: .6; }
 
 .checkbox-container {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    font-weight: 600;
-    font-size: 13px;
-    color: var(--text-label);
-    cursor: pointer;
-    user-select: none;
-    background: var(--bg-input);
-    padding: 0 20px;
-    border-radius: var(--border-radius-input);
-    height: 52px;
-    box-sizing: border-box;
-    border: 1px solid #e2e8f0;
-    flex: 1;
-    transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--text-label);
+  cursor: pointer;
+  user-select: none;
+  background: var(--bg-input);
+  padding: 0 20px;
+  border-radius: var(--border-radius-input);
+  min-height: 52px;
+  border: 1px solid #e2e8f0;
+  flex: 1;
+  transition: background .2s;
 }
 
-.checkbox-container:hover {
-    background: #edf2f7;
-}
+.checkbox-container:hover { background: #edf2f7; }
 
 .checkbox-container input {
-    flex: none;
-    width: 18px;
-    height: 18px;
-    cursor: pointer;
-    margin: 0;
+  flex: none;
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  margin: 0;
 }
 
 button {
-    background: var(--germany-black);
-    color: #ffffff;
-    border: none;
-    padding: 14px 24px;
-    border-radius: var(--border-radius-input);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    font-family: inherit;
-    transition: all 0.2s;
+  background: var(--germany-black);
+  color: #fff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: var(--border-radius-input);
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  font-family: inherit;
+  transition: all .2s;
 }
 
 button:hover {
-    background: #000000;
-    transform: translateY(-1px);
+  background: #000;
+  transform: translateY(-1px);
 }
 
 .btn-add {
-    background: #ffffff;
-    color: var(--germany-black);
-    border: 2px dashed #e2e8f0;
-    width: 100%;
-    padding: 16px;
-    border-radius: var(--border-radius-input);
-    font-weight: 600;
+  background: #fff;
+  color: var(--germany-black);
+  border: 2px dashed #e2e8f0;
+  width: 100%;
+  padding: 16px;
+  border-radius: var(--border-radius-input);
+  font-weight: 600;
 }
 
 .btn-add:hover {
-    background: var(--bg-input);
-    border-color: var(--germany-gold);
-    color: var(--germany-black);
-    transform: none;
+  background: var(--bg-input);
+  border-color: var(--germany-gold);
+  color: var(--germany-black);
+  transform: none;
 }
 
 .remove {
-    background: #fff5f5;
-    color: #e53e3e;
-    border: 1px solid #fed7d7;
-    margin-top: 10px;
-    padding: 10px 18px;
-    font-size: 13px;
+  background: #fff5f5;
+  color: #e53e3e;
+  border: 1px solid #fed7d7;
+  margin-top: 10px;
+  padding: 10px 18px;
+  font-size: 13px;
 }
 
 .remove:hover {
-    background: #fed7d7;
-    color: #9b2c2c;
-    transform: none;
+  background: #fed7d7;
+  color: #9b2c2c;
+  transform: none;
 }
 
 .footer {
-    text-align: center;
-    margin-top: 40px;
-    border-top: 2px solid #f0f2f5;
-    padding-top: 30px;
+  text-align: center;
+  margin-top: 40px;
+  border-top: 2px solid #f0f2f5;
+  padding-top: 30px;
 }
 
 .btn-submit {
-    background: var(--germany-red);
-    font-size: 16px;
-    padding: 18px 45px;
-    border-radius: var(--border-radius-input);
-    letter-spacing: 0.5px;
-    box-shadow: 0 4px 15px rgba(221, 0, 0, 0.2);
+  background: var(--germany-red);
+  font-size: 16px;
+  padding: 18px 45px;
+  border-radius: var(--border-radius-input);
+  letter-spacing: .5px;
+  box-shadow: 0 4px 15px rgba(221,0,0,.2);
 }
 
 .btn-submit:hover {
-    background: #b90000;
-    box-shadow: 0 6px 20px rgba(221, 0, 0, 0.3);
+  background: #b90000;
+  box-shadow: 0 6px 20px rgba(221,0,0,.3);
 }
 
-.hidden {
-    display: none !important;
-}
+.hidden { display: none !important; }
 
 .doc-section {
-    background: #f8f9fa;
-    padding: 20px;
-    border-radius: var(--border-radius-input);
-    border: 1px dashed #cbd5e0;
-    margin-top: 15px;
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: var(--border-radius-input);
+  border: 1px dashed #cbd5e0;
+  margin-top: 15px;
+}
+
+.divergencia-section {
+  margin-top: 25px;
+  padding: 22px;
+  border: 1px solid #e6eaf0;
+  border-radius: var(--border-radius-input);
+  background: #fbfcfd;
+}
+
+.divergencia-heading {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--germany-black);
+  margin: 0 0 15px;
+  text-transform: uppercase;
+  letter-spacing: .6px;
+}
+
+.divergencia-opcoes {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.divergencia-opcao {
+  flex: 1;
+  min-width: 220px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-label);
+}
+
+.divergencia-opcao input {
+  flex: none;
+  width: 17px;
+  height: 17px;
+  margin: 0;
+}
+
+.divergencia-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px;
+  margin-top: 14px;
+  background: #fff;
+}
+
+.divergencia-item-titulo {
+  font-size: 13px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: var(--germany-black);
+}
+
+.divergencia-item .row { margin-bottom: 12px; }
+.divergencia-item .row:last-of-type { margin-bottom: 0; }
+.divergencia-item input { background: #fbfcfd; }
+
+.btn-add-divergencia {
+  width: 100%;
+  margin-top: 14px;
+  background: #fff;
+  color: var(--germany-black);
+  border: 1px dashed #cbd5e0;
+}
+
+.btn-add-divergencia:hover {
+  background: #f8f9fa;
+  border-color: var(--germany-gold);
+  transform: none;
+}
+
+@media (max-width: 700px) {
+  body { padding: 15px 10px; }
+  .container { padding: 22px 16px; }
+  header {
+    font-size: 20px;
+    align-items: flex-start;
+    flex-direction: column;
+  }
+  .card { padding: 18px 14px; }
+  .row {
+    flex-direction: column;
+    gap: 10px;
+    align-items: stretch;
+    margin-bottom: 12px;
+  }
+  .row input, .row select, .row .checkbox-container {
+    width: 100%;
+    flex: auto;
+  }
+  .divergencia-section { padding: 15px; }
 }
 </style>
 </head>
 
 <body>
-
 <div class="container">
+  <header>
+    Análise documental
+    <div class="logo-badge">Cidadania4u</div>
+  </header>
 
-    <header>
-        Check List Alemanha
-        <div class="logo-badge">Cidadania4u</div>
-    </header>
+  <div class="box">
+    <h2>Árvore Genealógica (Gerações)</h2>
+    <div id="geracoes"></div>
+    <button class="btn-add" onclick="addGeracao()">+ Adicionar Geração</button>
+  </div>
 
-    <!-- GERAÇÕES -->
-    <div class="box">
-
-        <h2>Árvore Genealógica (Gerações)</h2>
-
-        <div id="geracoes"></div>
-
-        <button
-            class="btn-add"
-            onclick="addGeracao()"
-        >
-            + Adicionar Geração
-        </button>
-
-    </div>
-
-    <div class="footer">
-
-        <button
-            class="btn-submit"
-            onclick="gerarPDF()"
-        >
-            GERAR PDF
-        </button>
-
-    </div>
-
+  <div class="footer">
+    <button class="btn-submit" onclick="gerarPDF()">GERAR PDF</button>
+  </div>
 </div>
 
-
 <script>
-
 const parentesco = {
-
-    1: "Alemão(ã) Nato(a)",
-
-    2: "Filho(a)",
-
-    3: "Neto(a)",
-
-    4: "Bisneto(a)",
-
-    5: "Trineto(a)"
-
+  1: "Ascendente de origem",
+  2: "Filho(a)",
+  3: "Neto(a)",
+  4: "Bisneto(a)",
+  5: "Trineto(a)"
 };
 
-
-/* =========================================================
-   ATUALIZA OS TÍTULOS DAS GERAÇÕES
-   ========================================================= */
+let proximoIdDivergencia = 1;
 
 function atualizarTitulos() {
+  document.querySelectorAll("#geracoes .card").forEach((card) => {
+    const numeroGeracao = Number(card.dataset.geracao) || 1;
+    const subGeracao = card.dataset.subgeracao || "";
+    const parentescoTexto = parentesco[numeroGeracao] || "Descendente";
+    const identificacaoGeracao = subGeracao
+      ? `${numeroGeracao}.${subGeracao}`
+      : `${numeroGeracao}`;
 
-    document
-        .querySelectorAll("#geracoes .card")
-        .forEach((card) => {
+    card.querySelector(".title").innerText =
+      `Geração ${identificacaoGeracao} - ${parentescoTexto}`;
 
-            const numeroGeracao =
-                Number(card.dataset.geracao) || 1;
-
-            const subGeracao =
-                card.dataset.subgeracao || "";
-
-            const parentescoTexto =
-                parentesco[numeroGeracao] || "Descendente";
-
-
-            let identificacaoGeracao =
-                subGeracao
-                    ? `${numeroGeracao}.${subGeracao}`
-                    : `${numeroGeracao}`;
-
-
-            card.querySelector(".title").innerText =
-                `Geração ${identificacaoGeracao} - ${parentescoTexto}`;
-
-
-            card.dataset.parentesco =
-                parentescoTexto;
-
-        });
-
+    card.dataset.parentesco = parentescoTexto;
+  });
 }
-
-
-/* =========================================================
-   REMOVE UMA PESSOA
-   ========================================================= */
 
 function removerGeracao(btn) {
-
-    btn.parentElement.remove();
-
-    atualizarTitulos();
-
+  btn.closest(".card").remove();
+  atualizarTitulos();
 }
-
-
-/* =========================================================
-   MOSTRA / ESCONDE CAMPOS DE CASAMENTO
-   ========================================================= */
 
 function toggleCasamento(selectElement) {
+  const card = selectElement.closest(".card");
+  const dataInput = card.querySelector(".casamento-data");
+  const conjugeInput = card.querySelector(".conjuge-nome");
 
-    const card =
-        selectElement.closest(".card");
-
-
-    const dataInput =
-        card.querySelector(".casamento-data");
-
-
-    const conjugeInput =
-        card.querySelector(".conjuge-nome");
-
-
-    if (
-        selectElement.value === "casado"
-    ) {
-
-        dataInput.classList.remove("hidden");
-
-        conjugeInput.classList.remove("hidden");
-
-    } else {
-
-        dataInput.classList.add("hidden");
-
-        conjugeInput.classList.add("hidden");
-
-        dataInput.value = "";
-
-        conjugeInput.value = "";
-
-    }
-
+  if (selectElement.value === "casado") {
+    dataInput.classList.remove("hidden");
+    conjugeInput.classList.remove("hidden");
+  } else {
+    dataInput.classList.add("hidden");
+    conjugeInput.classList.add("hidden");
+    dataInput.value = "";
+    conjugeInput.value = "";
+  }
 }
-
-
-/* =========================================================
-   MOSTRA / ESCONDE DOCUMENTOS DO REQUERENTE
-   ========================================================= */
 
 function toggleRequerente(checkboxElement) {
+  const docSection = checkboxElement
+    .closest(".card")
+    .querySelector(".doc-section");
 
-    const docSection =
-        checkboxElement
-            .closest(".card")
-            .querySelector(".doc-section");
-
-
-    if (
-        checkboxElement.checked
-    ) {
-
-        docSection.classList.remove("hidden");
-
-    } else {
-
-        docSection.classList.add("hidden");
-
-        docSection
-            .querySelector(".doc-tipo")
-            .value = "RG";
-
-        docSection
-            .querySelector(".doc-num")
-            .value = "";
-
-        docSection
-            .querySelector(".doc-validade")
-            .value = "";
-
-    }
-
+  if (checkboxElement.checked) {
+    docSection.classList.remove("hidden");
+  } else {
+    docSection.classList.add("hidden");
+    docSection.querySelector(".doc-tipo").value = "RG";
+    docSection.querySelector(".doc-num").value = "";
+    docSection.querySelector(".doc-validade").value = "";
+  }
 }
 
+function toggleDivergencias(radioElement) {
+  const card = radioElement.closest(".card");
+  const detalhes = card.querySelector(".divergencias-detalhes");
 
-/* =========================================================
-   DESCOBRE A PRÓXIMA GERAÇÃO
-   ========================================================= */
+  if (radioElement.value === "sim") {
+    detalhes.classList.remove("hidden");
+
+    if (!detalhes.querySelector(".divergencia-item")) {
+      adicionarDivergencia(card.querySelector(".btn-add-divergencia"));
+    }
+  } else {
+    detalhes.classList.add("hidden");
+  }
+}
+
+function adicionarDivergencia(btn) {
+  const card = btn.closest(".card");
+  const lista = card.querySelector(".divergencias-lista");
+  const numero = lista.querySelectorAll(".divergencia-item").length + 1;
+  const id = proximoIdDivergencia++;
+
+  const item = document.createElement("div");
+  item.className = "divergencia-item";
+  item.dataset.divergenciaId = id;
+
+  item.innerHTML = `
+    <div class="divergencia-item-titulo">
+      Divergência <span class="numero-divergencia">${numero}</span>
+    </div>
+
+    <div class="row">
+      <input
+        class="divergencia-documento"
+        placeholder="Documento (ex.: Certidão de nascimento)"
+        aria-label="Documento da divergência"
+      >
+    </div>
+
+    <div class="row">
+      <input
+        class="divergencia-consta"
+        placeholder="Como consta no documento"
+        aria-label="Como consta no documento"
+      >
+
+      <input
+        class="divergencia-deveria"
+        placeholder="Como deveria constar"
+        aria-label="Como deveria constar"
+      >
+    </div>
+
+    <button
+      type="button"
+      class="remove"
+      onclick="removerDivergencia(this)"
+    >
+      Remover divergência
+    </button>
+  `;
+
+  lista.appendChild(item);
+  atualizarNumerosDivergencias(card);
+}
+
+function removerDivergencia(btn) {
+  const card = btn.closest(".card");
+  btn.closest(".divergencia-item").remove();
+
+  atualizarNumerosDivergencias(card);
+
+  if (!card.querySelector(".divergencias-lista .divergencia-item")) {
+    const radioSim = card.querySelector(
+      '.divergencia-status[value="sim"]'
+    );
+
+    if (radioSim.checked) {
+      adicionarDivergencia(card.querySelector(".btn-add-divergencia"));
+    }
+  }
+}
+
+function atualizarNumerosDivergencias(card) {
+  card.querySelectorAll(".divergencia-item").forEach((item, index) => {
+    item.querySelector(".numero-divergencia").textContent = index + 1;
+  });
+}
 
 function proximaGeracao() {
+  let maior = 0;
 
-    let maior = 0;
+  document.querySelectorAll("#geracoes .card").forEach(card => {
+    maior = Math.max(maior, Number(card.dataset.geracao) || 0);
+  });
 
-
-    document
-        .querySelectorAll("#geracoes .card")
-        .forEach(card => {
-
-            maior =
-                Math.max(
-                    maior,
-                    Number(card.dataset.geracao) || 0
-                );
-
-        });
-
-
-    return maior + 1;
-
+  return maior + 1;
 }
 
-
-/* =========================================================
-   CRIA UMA PESSOA
-   ========================================================= */
-
-function criarPessoa(
-    numeroGeracao,
-    subGeracao = null
-) {
-
-    const div =
-        document.createElement("div");
-
-
-    div.className =
-        "card";
-
-
-    div.dataset.geracao =
-        numeroGeracao;
-
-
-    div.dataset.subgeracao =
-        subGeracao || "";
-
-
-    div.innerHTML = `
-
-        <div class="title"></div>
-
-
-        <!-- NOME E DATA DE NASCIMENTO -->
-
-        <div class="row">
-
-            <input
-                placeholder="Nome completo"
-                class="nome"
-            >
-
-            <input
-                placeholder="Data nascimento"
-                class="nasc small"
-            >
-
-        </div>
-
-
-        <!-- LOCAL DE NASCIMENTO -->
-
-        <div class="row">
-
-            <input
-                placeholder="País de nascimento"
-                class="nasc-pais"
-            >
-
-            <input
-                placeholder="Estado de nascimento"
-                class="nasc-estado"
-            >
-
-            <input
-                placeholder="Cidade de nascimento"
-                class="nasc-cidade"
-            >
-
-        </div>
-
-
-        <!-- ESTADO CIVIL -->
-
-        <div class="row">
-
-            <select
-                onchange="toggleCasamento(this)"
-                class="casamento-status"
-            >
-
-                <option value="solteiro">
-                    Solteiro(a)
-                </option>
-
-                <option value="divorciado">
-                    Divorciado(a)
-                </option>
-
-                <option value="casado">
-                    Casado(a)
-                </option>
-
-            </select>
-
-
-            <!-- NOME DO CÔNJUGE -->
-
-            <input
-                placeholder="Nome do cônjuge"
-                class="conjuge-nome hidden"
-            >
-
-
-            <!-- DATA DO CASAMENTO -->
-
-            <input
-                placeholder="Data casamento"
-                class="casamento-data hidden"
-            >
-
-
-            <!-- REQUERENTE -->
-
-            <label class="checkbox-container">
-
-                <input
-                    type="checkbox"
-                    class="is-requerente"
-                    onchange="toggleRequerente(this)"
-                >
-
-                É Requerente?
-
-            </label>
-
-        </div>
-
-
-        <!-- DOCUMENTO -->
-
-        <div class="doc-section hidden">
-
-            <div class="row">
-
-                <select class="doc-tipo">
-
-                    <option value="RG">
-                        RG
-                    </option>
-
-                    <option value="Passaporte">
-                        Passaporte
-                    </option>
-
-                </select>
-
-
-                <input
-                    placeholder="Número do Documento"
-                    class="doc-num"
-                >
-
-
-                <input
-                    placeholder="Validade do Doc."
-                    class="doc-validade small"
-                >
-
-            </div>
-
-        </div>
-
-
-        <!-- MESMA GERAÇÃO -->
-
-        <div class="row">
-
-            <button
-                class="btn-add"
-                onclick="adicionarMesmaGeracao(this)"
-            >
-
-                + Adicionar pessoa na mesma geração
-
-            </button>
-
-        </div>
-
-
-        <!-- REMOVER -->
+function criarPessoa(numeroGeracao, subGeracao = null) {
+  const div = document.createElement("div");
+
+  div.className = "card";
+  div.dataset.geracao = numeroGeracao;
+  div.dataset.subgeracao = subGeracao || "";
+
+  div.innerHTML = `
+    <div class="title"></div>
+
+    <div class="row">
+      <input placeholder="Nome completo" class="nome">
+      <input placeholder="Data nascimento" class="nasc small">
+    </div>
+
+    <div class="row">
+      <input placeholder="País de nascimento" class="nasc-pais">
+      <input placeholder="Estado de nascimento" class="nasc-estado">
+      <input placeholder="Cidade de nascimento" class="nasc-cidade">
+    </div>
+
+    <div class="row">
+      <select onchange="toggleCasamento(this)" class="casamento-status">
+        <option value="solteiro">Solteiro(a)</option>
+        <option value="divorciado">Divorciado(a)</option>
+        <option value="casado">Casado(a)</option>
+      </select>
+
+      <input
+        placeholder="Nome do cônjuge"
+        class="conjuge-nome hidden"
+      >
+
+      <input
+        placeholder="Data casamento"
+        class="casamento-data hidden"
+      >
+
+      <label class="checkbox-container">
+        <input
+          type="checkbox"
+          class="is-requerente"
+          onchange="toggleRequerente(this)"
+        >
+        É Requerente?
+      </label>
+    </div>
+
+    <div class="doc-section hidden">
+      <div class="row">
+        <select class="doc-tipo">
+          <option value="RG">RG</option>
+          <option value="Passaporte">Passaporte</option>
+        </select>
+
+        <input placeholder="Número do Documento" class="doc-num">
+        <input placeholder="Validade do Doc." class="doc-validade small">
+      </div>
+    </div>
+
+    <section class="divergencia-section">
+      <div class="divergencia-heading">
+        Análise Documental – Divergências Identificadas
+      </div>
+
+      <div class="divergencia-opcoes">
+        <label class="divergencia-opcao">
+          <input
+            type="radio"
+            class="divergencia-status"
+            value="nao"
+            checked
+            onchange="toggleDivergencias(this)"
+          >
+          Não foram identificadas divergências
+        </label>
+
+        <label class="divergencia-opcao">
+          <input
+            type="radio"
+            class="divergencia-status"
+            value="sim"
+            onchange="toggleDivergencias(this)"
+          >
+          Foram identificadas divergências
+        </label>
+      </div>
+
+      <div class="divergencias-detalhes hidden">
+        <div class="divergencias-lista"></div>
 
         <button
-            class="remove"
-            onclick="removerGeracao(this)"
+          type="button"
+          class="btn-add-divergencia"
+          onclick="adicionarDivergencia(this)"
         >
-
-            Remover
-
+          + Adicionar divergência
         </button>
+      </div>
+    </section>
 
-    `;
+    <div class="row" style="margin-top:20px">
+      <button
+        class="btn-add"
+        onclick="adicionarMesmaGeracao(this)"
+      >
+        + Adicionar pessoa na mesma geração
+      </button>
+    </div>
 
+    <button class="remove" onclick="removerGeracao(this)">
+      Remover
+    </button>
+  `;
 
-    document
-        .getElementById("geracoes")
-        .appendChild(div);
+  // Mantém as opções de divergência independentes para cada pessoa.
+  const radioName =
+    `divergencia-pessoa-${Date.now()}-${Math.random().toString(36).slice(2)}`;
 
+  div.querySelectorAll(".divergencia-status").forEach(radio => {
+    radio.name = radioName;
+  });
 
-    atualizarTitulos();
-
+  document.getElementById("geracoes").appendChild(div);
+  atualizarTitulos();
 }
-
-
-/* =========================================================
-   ADICIONA NOVA GERAÇÃO
-   ========================================================= */
 
 function addGeracao() {
-
-    criarPessoa(
-        proximaGeracao()
-    );
-
+  criarPessoa(proximaGeracao());
 }
-
-
-/* =========================================================
-   ADICIONA PESSOA NA MESMA GERAÇÃO
-   ========================================================= */
 
 function adicionarMesmaGeracao(btn) {
+  const cardAtual = btn.closest(".card");
+  const numeroGeracao = Number(cardAtual.dataset.geracao);
 
-    const cardAtual =
-        btn.closest(".card");
+  const pessoasMesmaGeracao = document.querySelectorAll(
+    `#geracoes .card[data-geracao="${numeroGeracao}"]`
+  ).length;
 
-
-    const numeroGeracao =
-        Number(
-            cardAtual.dataset.geracao
-        );
-
-
-    /*
-       Conta quantas pessoas já existem
-       nessa mesma geração.
-    */
-
-    const pessoasMesmaGeracao =
-        document.querySelectorAll(
-            `#geracoes .card[data-geracao="${numeroGeracao}"]`
-        ).length;
-
-
-    /*
-       A primeira pessoa é:
-
-       Geração 2
-
-       A segunda:
-
-       Geração 2.1
-
-       A terceira:
-
-       Geração 2.2
-
-       etc.
-    */
-
-    const subGeracao =
-        pessoasMesmaGeracao;
-
-
-    criarPessoa(
-        numeroGeracao,
-        subGeracao
-    );
-
+  criarPessoa(numeroGeracao, pessoasMesmaGeracao);
 }
-
-
-/* =========================================================
-   GERAR PDF
-   ========================================================= */
 
 function gerarPDF() {
-
-    const { jsPDF } =
-        window.jspdf;
-
-
-    const pdf =
-        new jsPDF(
-            'p',
-            'mm',
-            'a4'
-        );
-
-
-    /* HEADER PRINCIPAL */
-
-    pdf.setTextColor(
-        17,
-        24,
-        37
+  if (!window.jspdf || !window.jspdf.jsPDF) {
+    alert(
+      "Não foi possível carregar a biblioteca do PDF. " +
+      "Verifique sua conexão com a internet e tente novamente."
     );
+    return;
+  }
 
+  const { jsPDF } = window.jspdf;
+  const pdf = new jsPDF("p", "mm", "a4");
 
-    pdf.setFontSize(
-        14
-    );
+  const margemEsquerda = 14;
+  const margemDireita = 14;
+  const larguraUtil = 182;
+  let y = 36;
 
+  // Controla o espaço disponível e cria páginas quando necessário.
+  function garantirEspaco(altura) {
+    if (y + altura > 280) {
+      pdf.addPage();
+      y = 20;
+    }
+  }
 
-    pdf.setFont(
-        "helvetica",
-        "bold"
-    );
+  // Cabeçalho do PDF.
+  pdf.setTextColor(17, 24, 37);
+  pdf.setFontSize(14);
+  pdf.setFont("helvetica", "bold");
 
+  pdf.text(
+    "EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA",
+    14,
+    16
+  );
+
+  pdf.setFillColor(17, 24, 37);
+  pdf.rect(14, 20, 15, 0.8, "F");
+
+  pdf.setFillColor(221, 0, 0);
+  pdf.rect(29, 20, 15, 0.8, "F");
+
+  pdf.setFillColor(212, 175, 55);
+  pdf.rect(44, 20, 15, 0.8, "F");
+
+  document.querySelectorAll("#geracoes .card").forEach((c) => {
+    const numeroGeracao = Number(c.dataset.geracao) || 1;
+    const subGeracao = c.dataset.subgeracao || "";
+
+    const parentescoTexto =
+      c.dataset.parentesco ||
+      parentesco[numeroGeracao] ||
+      "Descendente";
+
+    const nome =
+      c.querySelector(".nome").value.trim() ||
+      "Nome não informado";
+
+    const nasc =
+      c.querySelector(".nasc").value.trim() || "-";
+
+    const paisNascimento =
+      c.querySelector(".nasc-pais").value.trim() || "-";
+
+    const estadoNascimento =
+      c.querySelector(".nasc-estado").value.trim() || "-";
+
+    const cidadeNascimento =
+      c.querySelector(".nasc-cidade").value.trim() || "-";
+
+    const statusCasamento =
+      c.querySelector(".casamento-status").value;
+
+    const casou = statusCasamento === "casado";
+
+    const dataCasamento = casou
+      ? c.querySelector(".casamento-data").value.trim() || "-"
+      : "-";
+
+    const conjuge = casou
+      ? c.querySelector(".conjuge-nome").value.trim() || "-"
+      : "-";
+
+    const ehRequerente =
+      c.querySelector(".is-requerente").checked;
+
+    let statusTexto =
+      statusCasamento === "casado"
+        ? `Casado(a) em ${dataCasamento}`
+        : statusCasamento === "divorciado"
+          ? "Divorciado(a)"
+          : "Solteiro(a)";
+
+    const dadosFicha = [
+      ["Data de Nascimento", nasc],
+      [
+        "Local de Nascimento",
+        `${cidadeNascimento} - ${estadoNascimento} - ${paisNascimento}`
+      ],
+      ["Status de Casamento", statusTexto]
+    ];
+
+    if (casou) {
+      dadosFicha.push(["Nome do Cônjuge", conjuge]);
+    }
+
+    dadosFicha.push([
+      "É Requerente do Processo?",
+      ehRequerente ? "Sim" : "Não"
+    ]);
+
+    if (ehRequerente) {
+      dadosFicha.push([
+        "Tipo de Documento",
+        c.querySelector(".doc-tipo").value
+      ]);
+
+      dadosFicha.push([
+        "Número do Documento",
+        c.querySelector(".doc-num").value.trim() || "-"
+      ]);
+
+      dadosFicha.push([
+        "Validade do Documento",
+        c.querySelector(".doc-validade").value.trim() || "-"
+      ]);
+    }
+
+    // Título da geração e identificação da pessoa.
+    const identificacaoGeracao = subGeracao
+      ? `${numeroGeracao}.${subGeracao}`
+      : `${numeroGeracao}`;
+
+    let tituloTexto =
+      `Geração ${identificacaoGeracao} - ${parentescoTexto}: ${nome}`;
+
+    if (ehRequerente) {
+      tituloTexto += " [REQUERENTE DO PROCESSO]";
+    }
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(11);
+
+    const linhasTitulo =
+      pdf.splitTextToSize(tituloTexto, larguraUtil);
+
+    const alturaTitulo = linhasTitulo.length * 5 + 5;
+
+    garantirEspaco(alturaTitulo + 20);
+
+    pdf.setTextColor(17, 24, 37);
+    pdf.text(linhasTitulo, margemEsquerda, y);
+
+    const linhaY = y + linhasTitulo.length * 5 + 1;
+
+    pdf.setDrawColor(220, 225, 230);
+    pdf.setLineWidth(0.3);
+    pdf.line(margemEsquerda, linhaY, 196, linhaY);
+
+    // Tabela com os dados pessoais.
+    pdf.autoTable({
+      startY: linhaY + 2,
+      head: [],
+      body: dadosFicha,
+      theme: "plain",
+
+      styles: {
+        font: "helvetica",
+        fontSize: 9.5,
+        cellPadding: 3.2,
+        overflow: "linebreak",
+        textColor: [60, 65, 75],
+        valign: "top"
+      },
+
+      columnStyles: {
+        0: {
+          cellWidth: 55,
+          fontStyle: "bold",
+          textColor: [100, 110, 120]
+        },
+        1: {
+          cellWidth: "auto"
+        }
+      },
+
+      margin: {
+        left: margemEsquerda,
+        right: margemDireita,
+        bottom: 18
+      },
+
+      didParseCell: function(data) {
+        data.cell.styles.lineWidth = { bottom: 0.1 };
+        data.cell.styles.lineColor = [230, 235, 240];
+      }
+    });
+
+    y = pdf.lastAutoTable.finalY + 8;
+
+    // Seção de análise documental e divergências.
+    const statusDivergencia =
+      c.querySelector(".divergencia-status:checked")?.value || "nao";
+
+    garantirEspaco(18);
+
+    pdf.setFont("helvetica", "bold");
+    pdf.setFontSize(10);
+    pdf.setTextColor(17, 24, 37);
 
     pdf.text(
-        "EXTRATO DA REVISÃO DO PROCESSO DE CIDADANIA",
-        14,
-        16
+      "Análise Documental – Divergências Identificadas",
+      margemEsquerda,
+      y
     );
 
-
-    /* DETALHE DA BANDEIRA */
-
-    pdf.setFillColor(
-        17,
-        24,
-        37
-    );
-
-
-    pdf.rect(
-        14,
-        20,
-        15,
-        0.8,
-        'F'
-    );
-
-
-    pdf.setFillColor(
-        221,
-        0,
-        0
-    );
-
-
-    pdf.rect(
-        29,
-        20,
-        15,
-        0.8,
-        'F'
-    );
-
-
-    pdf.setFillColor(
-        212,
-        175,
-        55
-    );
-
-
-    pdf.rect(
-        44,
-        20,
-        15,
-        0.8,
-        'F'
-    );
-
-
-    let proximaY =
-        36;
-
-
-    /* =====================================================
-       PERCORRE TODAS AS PESSOAS
-       ===================================================== */
-
-    document
-        .querySelectorAll("#geracoes .card")
-        .forEach((c) => {
-
-
-            /* GERAÇÃO */
-
-            const numeroGeracao =
-                Number(
-                    c.dataset.geracao
-                ) || 1;
-
-
-            const subGeracao =
-                c.dataset.subgeracao || "";
-
-
-            const parentescoTexto =
-                c.dataset.parentesco ||
-                "Descendente";
-
-
-            /* NOME */
-
-            const nome =
-                c.querySelector(".nome").value ||
-                "Nome não informado";
-
-
-            /* NASCIMENTO */
-
-            const nasc =
-                c.querySelector(".nasc").value ||
-                "-";
-
-
-            /* LOCAL DE NASCIMENTO */
-
-            const paisNascimento =
-                c.querySelector(".nasc-pais").value ||
-                "-";
-
-
-            const estadoNascimento =
-                c.querySelector(".nasc-estado").value ||
-                "-";
-
-
-            const cidadeNascimento =
-                c.querySelector(".nasc-cidade").value ||
-                "-";
-
-
-            /* ESTADO CIVIL */
-
-            const statusCasamento =
-                c.querySelector(".casamento-status").value;
-
-
-            const casou =
-                statusCasamento === "casado";
-
-
-            const dataCasamento =
-                casou
-                    ? (
-                        c.querySelector(".casamento-data").value ||
-                        "-"
-                    )
-                    : "-";
-
-
-            const conjuge =
-                casou
-                    ? (
-                        c.querySelector(".conjuge-nome").value ||
-                        "-"
-                    )
-                    : "-";
-
-
-            /* REQUERENTE */
-
-            const ehRequerente =
-                c.querySelector(
-                    ".is-requerente"
-                ).checked;
-
-
-            /* TEXTO DO ESTADO CIVIL */
-
-            let statusTexto;
-
-
-            if (
-                statusCasamento === "casado"
-            ) {
-
-                statusTexto =
-                    `Casado(a) em ${dataCasamento}`;
-
-            }
-
-            else if (
-                statusCasamento === "divorciado"
-            ) {
-
-                statusTexto =
-                    "Divorciado(a)";
-
-            }
-
-            else {
-
-                statusTexto =
-                    "Solteiro(a)";
-
-            }
-
-
-            /* =================================================
-               DADOS DA FICHA
-               ================================================= */
-
-            let dadosFicha = [
-
-                [
-                    "Data de Nascimento",
-                    nasc
-                ],
-
-                [
-                    "Local de Nascimento",
-                    `${cidadeNascimento} - ${estadoNascimento} - ${paisNascimento}`
-                ],
-
-                [
-                    "Status de Casamento",
-                    statusTexto
-                ]
-
-            ];
-
-
-            /*
-               Só mostra o nome do cônjuge
-               quando a pessoa é casada.
-            */
-
-            if (
-                casou
-            ) {
-
-                dadosFicha.push([
-                    "Nome do Cônjuge",
-                    conjuge
-                ]);
-
-            }
-
-
-            dadosFicha.push([
-                "É Requerente do Processo?",
-                ehRequerente
-                    ? "Sim"
-                    : "Não"
-            ]);
-
-
-            /* =================================================
-               DOCUMENTOS DO REQUERENTE
-               ================================================= */
-
-            if (
-                ehRequerente
-            ) {
-
-                dadosFicha.push([
-                    "Tipo de Documento",
-                    c.querySelector(
-                        ".doc-tipo"
-                    ).value
-                ]);
-
-
-                dadosFicha.push([
-                    "Número do Documento",
-                    c.querySelector(
-                        ".doc-num"
-                    ).value || "-"
-                ]);
-
-
-                dadosFicha.push([
-                    "Validade do Documento",
-                    c.querySelector(
-                        ".doc-validade"
-                    ).value || "-"
-                ]);
-
-            }
-
-
-            /* =================================================
-               PREVENÇÃO DE QUEBRA DE PÁGINA
-               ================================================= */
-
-            let espacoNecessario =
-                25 +
-                (
-                    dadosFicha.length *
-                    7
-                );
-
-
-            if (
-                proximaY +
-                espacoNecessario >
-                280
-            ) {
-
-                pdf.addPage();
-
-                proximaY =
-                    25;
-
-            }
-
-
-            /* =================================================
-               TÍTULO
-               ================================================= */
-
-            pdf.setFontSize(
-                11
-            );
-
-
-            pdf.setFont(
-                "helvetica",
-                "bold"
-            );
-
-
-            pdf.setTextColor(
-                17,
-                24,
-                37
-            );
-
-
-            /*
-               Se for a primeira pessoa:
-
-               Geração 2
-
-               Se for uma pessoa da mesma geração:
-
-               Geração 2.1
-               Geração 2.2
-               Geração 2.3
-            */
-
-            let identificacaoGeracao =
-                subGeracao
-                    ? `${numeroGeracao}.${subGeracao}`
-                    : `${numeroGeracao}`;
-
-
-            let tituloTexto =
-                `Geração ${identificacaoGeracao} - ${parentescoTexto}: ${nome}`;
-
-
-            if (
-                ehRequerente
-            ) {
-
-                tituloTexto +=
-                    "   [REQUERENTE DO PROCESSO]";
-
-            }
-
-
-            pdf.text(
-                tituloTexto,
-                14,
-                proximaY
-            );
-
-
-            /* =================================================
-               DIVISÓRIA
-               ================================================= */
-
-            pdf.setDrawColor(
-                220,
-                225,
-                230
-            );
-
-
-            pdf.setLineWidth(
-                0.3
-            );
-
-
-            pdf.line(
-                14,
-                proximaY + 2,
-                196,
-                proximaY + 2
-            );
-
-
-            /* =================================================
-               TABELA
-               ================================================= */
-
-            pdf.autoTable({
-
-                startY:
-                    proximaY + 4,
-
-                head:
-                    null,
-
-                body:
-                    dadosFicha,
-
-                theme:
-                    "plain",
-
-                styles: {
-
-                    fontSize:
-                        9.5,
-
-                    padding:
-                        3.5,
-
-                    textColor:
-                        [
-                            60,
-                            65,
-                            75
-                        ]
-
-                },
-
-                columnStyles: {
-
-                    0: {
-
-                        cellWidth:
-                            55,
-
-                        fontStyle:
-                            'bold',
-
-                        textColor:
-                            [
-                                100,
-                                110,
-                                120
-                            ]
-
-                    },
-
-                    1: {
-
-                        cellWidth:
-                            'auto'
-
-                    }
-
-                },
-
-                margin: {
-
-                    left:
-                        14,
-
-                    right:
-                        14
-
-                },
-
-                /*
-                   Não há mais nenhuma regra
-                   deixando o Status de Casamento
-                   em vermelho.
-                */
-
-                didParseCell:
-                    function(data) {
-
-                        data.cell.styles.lineWidth =
-                            {
-                                bottom: 0.1
-                            };
-
-
-                        data.cell.styles.lineColor =
-                            [
-                                230,
-                                235,
-                                240
-                            ];
-
-                    }
-
-            });
-
-
-            /* PRÓXIMA POSIÇÃO */
-
-            proximaY =
-                pdf.lastAutoTable.finalY +
-                14;
-
+    y += 6;
+
+    if (statusDivergencia === "nao") {
+      pdf.setFont("helvetica", "normal");
+      pdf.setFontSize(9.5);
+      pdf.setTextColor(60, 65, 75);
+
+      pdf.text(
+        "Não foram identificadas divergências documentais.",
+        margemEsquerda,
+        y
+      );
+
+      y += 7;
+    } else {
+      const divergencias = Array.from(
+        c.querySelectorAll(".divergencia-item")
+      );
+
+      if (divergencias.length === 0) {
+        garantirEspaco(12);
+
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(9.5);
+
+        pdf.text(
+          "Foram identificadas divergências, mas nenhum detalhe foi preenchido.",
+          margemEsquerda,
+          y
+        );
+
+        y += 7;
+      } else {
+        divergencias.forEach((item, index) => {
+          const documento =
+            item.querySelector(".divergencia-documento").value.trim() ||
+            "Não informado";
+
+          const consta =
+            item.querySelector(".divergencia-consta").value.trim() ||
+            "Não informado";
+
+          const deveria =
+            item.querySelector(".divergencia-deveria").value.trim() ||
+            "Não informado";
+
+          const tabelaDivergencia = [
+            [`Divergência ${index + 1} — Documento`, documento],
+            ["Como consta no documento", consta],
+            ["Como deveria constar", deveria]
+          ];
+
+          // O AutoTable ajusta o conteúdo e administra as quebras de página.
+          pdf.autoTable({
+            startY: y,
+            head: [],
+            body: tabelaDivergencia,
+            theme: "grid",
+
+            styles: {
+              font: "helvetica",
+              fontSize: 9,
+              cellPadding: 3.2,
+              overflow: "linebreak",
+              textColor: [60, 65, 75],
+              lineColor: [225, 230, 235],
+              lineWidth: 0.2,
+              valign: "top"
+            },
+
+            columnStyles: {
+              0: {
+                cellWidth: 55,
+                fontStyle: "bold",
+                fillColor: [248, 249, 250],
+                textColor: [80, 90, 100]
+              },
+              1: {
+                cellWidth: "auto"
+              }
+            },
+
+            margin: {
+              left: margemEsquerda,
+              right: margemDireita,
+              bottom: 18
+            },
+
+            pageBreak: "auto",
+            rowPageBreak: "avoid"
+          });
+
+          y = pdf.lastAutoTable.finalY + 4;
         });
 
+        y += 2;
+      }
+    }
 
-    /* =====================================================
-       SALVAR
-       ===================================================== */
+    y += 8;
+  });
 
-    pdf.save(
-        "analise-cidadania-alema.pdf"
-    );
-
+  pdf.save("analise-cidadania-alema.pdf");
 }
 
+// Inicia o formulário com a primeira pessoa/geração.
+criarPessoa(1);
 </script>
-
 </body>
 </html>
