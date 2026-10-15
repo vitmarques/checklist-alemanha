@@ -132,9 +132,7 @@ input, select, textarea {
   transition: all .2s ease;
 }
 
-input, select {
-  height: 52px;
-}
+input, select { height: 52px; }
 
 textarea {
   width: 100%;
@@ -150,9 +148,7 @@ input:focus, select:focus, textarea:focus {
   box-shadow: 0 0 0 4px rgba(17,24,39,.05);
 }
 
-input::placeholder, textarea::placeholder {
-  color: #a0aec0;
-}
+input::placeholder, textarea::placeholder { color: #a0aec0; }
 
 .small { flex: .6; }
 
@@ -312,24 +308,52 @@ button:hover {
   margin: 0;
 }
 
-.divergencia-item {
-  border: 1px solid #e2e8f0;
+/* Cada documento possui sua própria lista de divergências. */
+.documento-divergencia {
+  border: 1px solid #dce3eb;
   border-radius: 12px;
   padding: 18px;
-  margin-top: 14px;
-  background: #fff;
+  margin-top: 15px;
+  background: #f8fafc;
 }
 
-.divergencia-item-titulo {
+.documento-divergencia-titulo {
   font-size: 13px;
   font-weight: 700;
   margin-bottom: 15px;
   color: var(--germany-black);
 }
 
-.divergencia-item .row { margin-bottom: 12px; }
-.divergencia-item .row:last-of-type { margin-bottom: 0; }
-.divergencia-item input { background: #fbfcfd; }
+.documento-divergencia .row {
+  margin-bottom: 12px;
+}
+
+.documento-divergencia input {
+  background: #fff;
+}
+
+.dado-divergencia-item {
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  padding: 16px;
+  margin-top: 14px;
+  background: #fff;
+}
+
+.dado-divergencia-titulo {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-label);
+  margin-bottom: 12px;
+}
+
+.dado-divergencia-item .row {
+  margin-bottom: 12px;
+}
+
+.dado-divergencia-item .row:last-of-type {
+  margin-bottom: 0;
+}
 
 .btn-add-divergencia {
   width: 100%;
@@ -342,6 +366,20 @@ button:hover {
 .btn-add-divergencia:hover {
   background: #f8f9fa;
   border-color: var(--germany-gold);
+  transform: none;
+}
+
+.btn-add-documento {
+  width: 100%;
+  margin-top: 15px;
+  background: #fff;
+  color: var(--germany-black);
+  border: 1px dashed var(--germany-gold);
+}
+
+.btn-add-documento:hover {
+  background: var(--germany-gold-light);
+  color: var(--germany-black);
   transform: none;
 }
 
@@ -370,25 +408,33 @@ button:hover {
 @media (max-width: 700px) {
   body { padding: 15px 10px; }
   .container { padding: 22px 16px; }
+
   header {
     font-size: 20px;
     align-items: flex-start;
     flex-direction: column;
   }
+
   .card { padding: 18px 14px; }
+
   .row {
     flex-direction: column;
     gap: 10px;
     align-items: stretch;
     margin-bottom: 12px;
   }
+
   .row input, .row select, .row textarea,
   .row .checkbox-container {
     width: 100%;
     flex: auto;
   }
+
   .divergencia-section,
   .observacoes-section { padding: 15px; }
+
+  .documento-divergencia,
+  .dado-divergencia-item { padding: 12px; }
 }
 </style>
 </head>
@@ -419,8 +465,6 @@ const parentesco = {
   4: "Bisneto(a)",
   5: "Trineto(a)"
 };
-
-let proximoIdDivergencia = 1;
 
 function atualizarTitulos() {
   document.querySelectorAll("#geracoes .card").forEach((card) => {
@@ -481,35 +525,76 @@ function toggleDivergencias(radioElement) {
   if (radioElement.value === "sim") {
     detalhes.classList.remove("hidden");
 
-    if (!detalhes.querySelector(".divergencia-item")) {
-      adicionarDivergencia(card.querySelector(".btn-add-divergencia"));
+    if (!detalhes.querySelector(".documento-divergencia")) {
+      adicionarDocumentoDivergencia(
+        card.querySelector(".btn-add-documento")
+      );
     }
   } else {
     detalhes.classList.add("hidden");
   }
 }
 
-function adicionarDivergencia(btn) {
+/* Adiciona um documento. Cada documento tem sua própria lista de dados incorretos. */
+function adicionarDocumentoDivergencia(btn) {
   const card = btn.closest(".card");
-  const lista = card.querySelector(".divergencias-lista");
-  const numero = lista.querySelectorAll(".divergencia-item").length + 1;
-  const id = proximoIdDivergencia++;
+  const lista = card.querySelector(".documentos-divergencias-lista");
+  const numero = lista.querySelectorAll(".documento-divergencia").length + 1;
 
-  const item = document.createElement("div");
-  item.className = "divergencia-item";
-  item.dataset.divergenciaId = id;
+  const documento = document.createElement("div");
+  documento.className = "documento-divergencia";
 
-  item.innerHTML = `
-    <div class="divergencia-item-titulo">
-      Divergência <span class="numero-divergencia">${numero}</span>
+  documento.innerHTML = `
+    <div class="documento-divergencia-titulo">
+      Documento <span class="numero-documento">${numero}</span>
     </div>
 
     <div class="row">
       <input
-        class="divergencia-documento"
-        placeholder="Documento (ex.: Certidão de nascimento)"
-        aria-label="Documento da divergência"
+        class="nome-documento-divergencia"
+        placeholder="Nome do documento (ex.: Certidão de nascimento)"
+        aria-label="Nome do documento"
       >
+    </div>
+
+    <div class="dados-divergencias-lista"></div>
+
+    <button
+      type="button"
+      class="btn-add-divergencia"
+      onclick="adicionarDadoIncorreto(this)"
+    >
+      + Adicionar outro dado incorreto
+    </button>
+
+    <button
+      type="button"
+      class="remove"
+      onclick="removerDocumentoDivergencia(this)"
+    >
+      Remover documento
+    </button>
+  `;
+
+  lista.appendChild(documento);
+
+  // Ao adicionar um documento, cria automaticamente seu primeiro conjunto de campos.
+  adicionarDadoIncorreto(documento.querySelector(".btn-add-divergencia"));
+  atualizarNumerosDocumentos(card);
+}
+
+/* Adiciona uma divergência dentro do documento selecionado. */
+function adicionarDadoIncorreto(btn) {
+  const documento = btn.closest(".documento-divergencia");
+  const lista = documento.querySelector(".dados-divergencias-lista");
+  const numero = lista.querySelectorAll(".dado-divergencia-item").length + 1;
+
+  const item = document.createElement("div");
+  item.className = "dado-divergencia-item";
+
+  item.innerHTML = `
+    <div class="dado-divergencia-titulo">
+      Dado incorreto <span class="numero-dado-divergencia">${numero}</span>
     </div>
 
     <div class="row">
@@ -537,36 +622,67 @@ function adicionarDivergencia(btn) {
     <button
       type="button"
       class="remove"
-      onclick="removerDivergencia(this)"
+      onclick="removerDadoIncorreto(this)"
     >
-      Remover divergência
+      Remover dado incorreto
     </button>
   `;
 
   lista.appendChild(item);
-  atualizarNumerosDivergencias(card);
+  atualizarNumerosDivergencias(documento);
 }
 
-function removerDivergencia(btn) {
+function removerDadoIncorreto(btn) {
+  const documento = btn.closest(".documento-divergencia");
   const card = btn.closest(".card");
-  btn.closest(".divergencia-item").remove();
 
-  atualizarNumerosDivergencias(card);
+  btn.closest(".dado-divergencia-item").remove();
+  atualizarNumerosDivergencias(documento);
 
-  if (!card.querySelector(".divergencias-lista .divergencia-item")) {
-    const radioSim = card.querySelector(
-      '.divergencia-status[value="sim"]'
-    );
+  // Mantém pelo menos um conjunto de campos quando a análise está marcada como "Sim".
+  const radioSim = card.querySelector('.divergencia-status[value="sim"]');
 
-    if (radioSim.checked) {
-      adicionarDivergencia(card.querySelector(".btn-add-divergencia"));
-    }
+  if (
+    radioSim.checked &&
+    !card.querySelector(".documentos-divergencias-lista .documento-divergencia")
+  ) {
+    adicionarDocumentoDivergencia(card.querySelector(".btn-add-documento"));
+  } else if (
+    radioSim.checked &&
+    documento.querySelectorAll(".dado-divergencia-item").length === 0
+  ) {
+    adicionarDadoIncorreto(documento.querySelector(".btn-add-divergencia"));
   }
 }
 
-function atualizarNumerosDivergencias(card) {
-  card.querySelectorAll(".divergencia-item").forEach((item, index) => {
-    item.querySelector(".numero-divergencia").textContent = index + 1;
+function removerDocumentoDivergencia(btn) {
+  const card = btn.closest(".card");
+  const documento = btn.closest(".documento-divergencia");
+
+  documento.remove();
+  atualizarNumerosDocumentos(card);
+
+  const radioSim = card.querySelector('.divergencia-status[value="sim"]');
+
+  // Se todos os documentos forem removidos, cria um novo documento vazio para preenchimento.
+  if (
+    radioSim.checked &&
+    !card.querySelector(".documento-divergencia")
+  ) {
+    adicionarDocumentoDivergencia(card.querySelector(".btn-add-documento"));
+  }
+}
+
+function atualizarNumerosDocumentos(card) {
+  card.querySelectorAll(".documento-divergencia").forEach((documento, index) => {
+    documento.querySelector(".numero-documento").textContent = index + 1;
+    atualizarNumerosDivergencias(documento);
+  });
+}
+
+function atualizarNumerosDivergencias(documento) {
+  documento.querySelectorAll(".dado-divergencia-item").forEach((item, index) => {
+    item.querySelector(".numero-dado-divergencia").textContent = index + 1;
   });
 }
 
@@ -669,14 +785,14 @@ function criarPessoa(numeroGeracao, subGeracao = null) {
       </div>
 
       <div class="divergencias-detalhes hidden">
-        <div class="divergencias-lista"></div>
+        <div class="documentos-divergencias-lista"></div>
 
         <button
           type="button"
-          class="btn-add-divergencia"
-          onclick="adicionarDivergencia(this)"
+          class="btn-add-documento"
+          onclick="adicionarDocumentoDivergencia(this)"
         >
-          + Adicionar divergência
+          + Adicionar documento com divergência
         </button>
       </div>
     </section>
@@ -748,7 +864,6 @@ function gerarPDF() {
   const larguraUtil = 182;
   let y = 36;
 
-  // Controla o espaço disponível e cria páginas quando necessário.
   function garantirEspaco(altura) {
     if (y + altura > 280) {
       pdf.addPage();
@@ -859,7 +974,6 @@ function gerarPDF() {
       ]);
     }
 
-    // Título da geração e identificação da pessoa.
     const identificacaoGeracao = subGeracao
       ? `${numeroGeracao}.${subGeracao}`
       : `${numeroGeracao}`;
@@ -890,7 +1004,6 @@ function gerarPDF() {
     pdf.setLineWidth(0.3);
     pdf.line(margemEsquerda, linhaY, 196, linhaY);
 
-    // Tabela com os dados pessoais.
     pdf.autoTable({
       startY: linhaY + 2,
       head: [],
@@ -931,7 +1044,7 @@ function gerarPDF() {
 
     y = pdf.lastAutoTable.finalY + 8;
 
-    // Seção de análise documental e divergências.
+    // Análise documental.
     const statusDivergencia =
       c.querySelector(".divergencia-status:checked")?.value || "nao";
 
@@ -964,96 +1077,131 @@ function gerarPDF() {
 
       y += 7;
     } else {
-      const divergencias = Array.from(
-        c.querySelectorAll(".divergencia-item")
+      const documentos = Array.from(
+        c.querySelectorAll(".documento-divergencia")
       );
 
-      if (divergencias.length === 0) {
+      if (documentos.length === 0) {
         garantirEspaco(12);
 
         pdf.setFont("helvetica", "normal");
         pdf.setFontSize(9.5);
 
         pdf.text(
-          "Foram identificadas divergências, mas nenhum detalhe foi preenchido.",
+          "Foram identificadas divergências, mas nenhum documento foi preenchido.",
           margemEsquerda,
           y
         );
 
         y += 7;
       } else {
-        divergencias.forEach((item, index) => {
-          const documento =
-            item.querySelector(".divergencia-documento").value.trim() ||
-            "Não informado";
+        documentos.forEach((documento, indiceDocumento) => {
+          const nomeDocumento =
+            documento.querySelector(".nome-documento-divergencia")
+              .value.trim() || "Documento não informado";
 
-          const dadoIncorreto =
-            item.querySelector(".divergencia-dado").value.trim() ||
-            "Não informado";
+          const dadosIncorretos = Array.from(
+            documento.querySelectorAll(".dado-divergencia-item")
+          );
 
-          const consta =
-            item.querySelector(".divergencia-consta").value.trim() ||
-            "Não informado";
+          // Nome do documento aparece apenas uma vez no PDF.
+          garantirEspaco(16);
 
-          const deveria =
-            item.querySelector(".divergencia-deveria").value.trim() ||
-            "Não informado";
+          pdf.setFont("helvetica", "bold");
+          pdf.setFontSize(9.5);
+          pdf.setTextColor(17, 24, 37);
 
-          const tabelaDivergencia = [
-            [`Divergência ${index + 1} — Documento`, documento],
-            ["Dado incorreto", dadoIncorreto],
-            ["Como consta no documento", consta],
-            ["Como deveria constar", deveria]
-          ];
+          const tituloDocumento =
+            `Documento ${indiceDocumento + 1}: ${nomeDocumento}`;
 
-          // Cada divergência pode ser de um documento diferente.
-          pdf.autoTable({
-            startY: y,
-            head: [],
-            body: tabelaDivergencia,
-            theme: "grid",
+          const linhasDocumento = pdf.splitTextToSize(
+            tituloDocumento,
+            larguraUtil
+          );
 
-            styles: {
-              font: "helvetica",
-              fontSize: 9,
-              cellPadding: 3.2,
-              overflow: "linebreak",
-              textColor: [60, 65, 75],
-              lineColor: [225, 230, 235],
-              lineWidth: 0.2,
-              valign: "top"
-            },
+          pdf.text(linhasDocumento, margemEsquerda, y);
+          y += linhasDocumento.length * 4.5 + 2;
 
-            columnStyles: {
-              0: {
-                cellWidth: 55,
-                fontStyle: "bold",
-                fillColor: [248, 249, 250],
-                textColor: [80, 90, 100]
-              },
-              1: {
-                cellWidth: "auto"
-              }
-            },
+          if (dadosIncorretos.length === 0) {
+            pdf.setFont("helvetica", "normal");
+            pdf.setFontSize(9);
 
-            margin: {
-              left: margemEsquerda,
-              right: margemDireita,
-              bottom: 18
-            },
+            pdf.text(
+              "Nenhum dado incorreto foi informado para este documento.",
+              margemEsquerda + 2,
+              y
+            );
 
-            pageBreak: "auto",
-            rowPageBreak: "avoid"
-          });
+            y += 7;
+          } else {
+            dadosIncorretos.forEach((item, indiceDado) => {
+              const dadoIncorreto =
+                item.querySelector(".divergencia-dado")
+                  .value.trim() || "Não informado";
 
-          y = pdf.lastAutoTable.finalY + 4;
+              const consta =
+                item.querySelector(".divergencia-consta")
+                  .value.trim() || "Não informado";
+
+              const deveria =
+                item.querySelector(".divergencia-deveria")
+                  .value.trim() || "Não informado";
+
+              const tabelaDivergencia = [
+                [`Dado incorreto ${indiceDado + 1}`, dadoIncorreto],
+                ["Como consta no documento", consta],
+                ["Como deveria constar", deveria]
+              ];
+
+              pdf.autoTable({
+                startY: y,
+                head: [],
+                body: tabelaDivergencia,
+                theme: "grid",
+
+                styles: {
+                  font: "helvetica",
+                  fontSize: 9,
+                  cellPadding: 3.2,
+                  overflow: "linebreak",
+                  textColor: [60, 65, 75],
+                  lineColor: [225, 230, 235],
+                  lineWidth: 0.2,
+                  valign: "top"
+                },
+
+                columnStyles: {
+                  0: {
+                    cellWidth: 55,
+                    fontStyle: "bold",
+                    fillColor: [248, 249, 250],
+                    textColor: [80, 90, 100]
+                  },
+                  1: {
+                    cellWidth: "auto"
+                  }
+                },
+
+                margin: {
+                  left: margemEsquerda + 2,
+                  right: margemDireita,
+                  bottom: 18
+                },
+
+                pageBreak: "auto",
+                rowPageBreak: "avoid"
+              });
+
+              y = pdf.lastAutoTable.finalY + 4;
+            });
+          }
+
+          y += 4;
         });
-
-        y += 2;
       }
     }
 
-    // Campo de observações da pessoa.
+    // Observações da pessoa.
     const observacoes =
       c.querySelector(".observacoes").value.trim();
 
@@ -1124,5 +1272,8 @@ function gerarPDF() {
 // Inicia o formulário com a primeira pessoa/geração.
 criarPessoa(1);
 </script>
+</body>
+</html>
+
 </body>
 </html>
